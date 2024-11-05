@@ -8,5 +8,5 @@ This repository contains the code for our LocalHero website, created for the SOE
 - [Tailwind CSS](https://tailwindcss.com/): CSS library that helps styling the website
 - [Tailwind Variants](https://tailwind-variants.org): CSS library extension for tailwind
 - [ReactJS](https://www.typescriptlang.org/): Frontend library to facilitate creation of website
-- [NodeJS]([https://expressjs.com/](https://nodejs.org/en): Backend
+- [NodeJS](https://nodejs.org/en/): Backend
 - [Mongoose](https://mongoosejs.com/docs/): Backend database used to store different values for users, properties, etc.
