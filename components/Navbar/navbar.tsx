@@ -2,21 +2,29 @@
 
 import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Input, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar} from "@nextui-org/react";
 import Image from "next/image";
-import LogoLocalHero from "../public/images/LocalHero_logo_no_background.png";
+import LogoLocalHero from "../../public/images/LocalHero_logo_no_background.png";
 import { CiSearch } from "react-icons/ci";
 import {AvatarIcon} from "@nextui-org/react";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
 export default function App() {
+  const { data: session } = useSession();
+  const router = useRouter();
+
   return (
     <Navbar isBordered style={{ backgroundColor: '#04b54e' }}>
       <NavbarContent justify="start">
         <NavbarBrand className="mr-4">
-          <Image
-            src={LogoLocalHero}
-            alt="logo image"
-            width={75}
-            height={75}
-            className="z-20"
-            />
+          <Link href="/">
+            <Image
+              src={LogoLocalHero}
+              alt="logo image"
+              width={75}
+              height={75}
+              className="z-20"
+              />
+          </Link>
         </NavbarBrand>
         <NavbarContent className="hidden sm:flex gap-3">
         <NavbarItem>
@@ -70,17 +78,24 @@ export default function App() {
           </DropdownTrigger>
           <DropdownMenu aria-label="Profile Actions" variant="flat">
             <DropdownItem key="profile" className="h-14 gap-2">
-              <p className="font-semibold">Signed in as</p>
-              <p className="font-semibold">zoey@example.com</p>
+              <p className="font-semibold">Signed in as {session && session.user ? session.user.name : "Guest"} </p>
+              <p className="font-semibold">{session && session.user ? session.user.email : "Guest"}</p>
             </DropdownItem>
             <DropdownItem key="settings">My Settings</DropdownItem>
-            <DropdownItem key="team_settings">Team Settings</DropdownItem>
-            <DropdownItem key="analytics">Analytics</DropdownItem>
-            <DropdownItem key="system">System</DropdownItem>
-            <DropdownItem key="configurations">Configurations</DropdownItem>
             <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
-            <DropdownItem key="logout" color="danger">
-              Log Out
+            <DropdownItem
+              key={session ? "logout" : "login"}
+              color={session ? "danger" : "primary"}
+              onPress={async () => {
+                if (session) {
+                  await signOut({ redirect: false }); 
+                  router.push("/login"); 
+                } else {
+                  router.push("/login");
+                }
+              }}
+            >
+             {session ? "Log Out" : "Log In"}
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>

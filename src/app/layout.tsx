@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import {Providers} from "./providers";
+import {Authprovider} from "./providerAuth"
 
 
 const geistSans = localFont({
@@ -17,7 +18,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "LocalHero",
-  description: "brand name",
+  description: "LocalHero company",
 };
 
 export default function RootLayout({
@@ -27,11 +28,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
+          <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          {children}
+          <Authprovider>
+            {children}
+          </Authprovider>
         </Providers>
       </body>
     </html>
