@@ -5,14 +5,16 @@ import Image from "next/image";
 import LogoLocalHero from "../../public/images/LocalHero_logo_no_background.png";
 import { CiSearch } from "react-icons/ci";
 import {AvatarIcon} from "@nextui-org/react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function App() {
   const { data: session } = useSession();
   const router = useRouter();
+  
 
   return (
+    
     <Navbar isBordered style={{ backgroundColor: '#04b54e' }}>
       <NavbarContent justify="start">
         <NavbarBrand className="mr-4">
