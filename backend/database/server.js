@@ -7,9 +7,14 @@ const {
   postUser,
   putUser,
   deleteUser,
-  checkUser
+  checkUser,
+  getBusinesses,
+  getUserBusinesses,
+  getBusiness,
+  addBusiness,
+  putBusiness,
+  deleteBusiness
 } = require("./controller.js");
-
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -23,8 +28,12 @@ app.prepare().then(() => {
     process.exit(1);
   });
   
+
   // Add your Express middleware and routes here
 
+  //---------------------------------------------------------------
+  //For users
+  //---------------------------------------------------------------
   server.get("/api/userExists/:email", async (req, res) => {
     checkUser(req, res);
   });
@@ -38,24 +47,51 @@ app.prepare().then(() => {
   });
 
   server.post("/api/users", (req, res) => {
-    //res.status(200).json({ method: 'POST Request' });
     postUser(req, res);
   });
 
   server.put("/api/users", (req, res) => {
-    //res.status(200).json({ method: 'PUT Request' });
     putUser(req, res);
   });
 
   server.delete("/api/users", (req, res) => {
-    //res.status(200).json({ method: 'DELETE Request' });
     deleteUser(req, res);
   });
+
+
+  
+  //---------------------------------------------------------------
+  //For businesses
+  //---------------------------------------------------------------
+  server.get("/api/business", (req, res) => {
+    getBusinesses(req, res);
+  });
+
+  server.get("/api/userbusiness/:userID", (req, res) => {
+    getUserBusinesses(req, res);
+  });
+  
+  server.get("/api/business/:businessId", (req, res) => {
+    getBusiness(req, res);
+  });
+
+  server.post("/api/business", (req, res) => {
+    console.log("Received business payload:", req.body)
+    addBusiness(req, res);
+  });
+
+  server.put("/api/business", (req, res) => {
+    putBusiness(req, res);
+  });
+
+  server.delete("/api/business", (req, res) => {
+    deleteBusiness(req, res);
+  });
+
 
   //---------------------------------------------------------------
   //For tests
   //---------------------------------------------------------------
-
   server.get('/test', async (req, res) => {
     res.json({message: 'pass!'})
   })
