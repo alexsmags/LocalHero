@@ -1,10 +1,11 @@
 'use client';
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import { Button, Card, CardBody, CardHeader } from "@nextui-org/react";
 import AddBusinessModal from "../../../../components/CRUD - Business/Modals/ModalAddBusiness";
 import EditBusinessModal from "../../../../components/CRUD - Business/Modals/ModalEditBusiness";
 import ConfirmationModal from "../../../../components/CRUD - Business/Modals/ConfirmationModal";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { getUserBusinesses, deleteBusiness } from "../../../../backend/lib/HelperBusiness";
 
 interface Business {
@@ -23,96 +24,60 @@ interface Category {
 
 const BusinessCRUDPage = () => {
   const { data: session } = useSession();
-  const [businesses, setBusinesses] = useState<Business[]>([]);
+  const queryClient = useQueryClient();
+
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
   const [businessToDelete, setBusinessToDelete] = useState<string | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories] = useState<Category[]>([
+    { _id: "1", name: "Artisans" },
+    { _id: "2", name: "Business" },
+    { _id: "3", name: "Tech" },
+    { _id: "4", name: "Retail" },
+    { _id: "5", name: "Services" },
+  ]);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadCategories = () => {
-      const hardcodedCategories: Category[] = [
-        { _id: "1", name: "Artisans" },
-        { _id: "2", name: "Business" },
-        { _id: "3", name: "Tech" },
-        { _id: "4", name: "Retail" },
-        { _id: "5", name: "Services" },
-      ];
-      setCategories(hardcodedCategories);
-    };
+  // Fetch businesses with React Query
+  const { data: businesses = [], refetch } = useQuery({
+    queryKey: ["businesses", session?.user?.id],
+    queryFn: () => getUserBusinesses(session?.user?.id),
+    enabled: !!session?.user?.id, // Ensure query only runs if session.user.id exists
+  });
 
-    loadCategories();
-  }, []);
-
-  useEffect(() => {
-    const fetchBusinesses = async () => {
-      if (session?.user?.id) {
-        try {
-          const userBusinesses = await getUserBusinesses(session.user.id);
-          setBusinesses(Array.isArray(userBusinesses) ? userBusinesses : []);
-        } catch (error) {
-          console.error("Error fetching businesses:", error);
-          setBusinesses([]);
-        }
-      }
-    };
-
-    fetchBusinesses();
-  }, [session]);
-
-  const handleAddOrUpdateBusiness = (businessData: Omit<Business, "_id">) => {
-    if (selectedBusiness) {
-      setBusinesses((prev) =>
-        prev.map((b) =>
-          b._id === selectedBusiness._id ? { ...selectedBusiness, ...businessData } : b
-        )
-      );
-    } else {
-      const newBusiness: Business = { ...businessData, _id: Date.now().toString() };
-      setBusinesses((prev) => [...prev, newBusiness]);
-    }
-    setAddModalOpen(false);
-    setSelectedBusiness(null);
-  };
-
-  const confirmDeleteBusiness = async () => {
-    if (businessToDelete) {
-      try {
-        await deleteBusiness(businessToDelete);
-        setBusinesses((prev) => prev.filter((b) => b._id !== businessToDelete));
-        setSuccessMessage("Business deleted successfully!");
-        setTimeout(() => setSuccessMessage(null), 3000);
-      } catch (error) {
-        console.error("Failed to delete business:", error);
-      } finally {
-        setDeleteModalOpen(false);
-        setBusinessToDelete(null);
-      }
-    }
-  };
-
-  const handleEditBusiness = (business: Business) => {
-    setSelectedBusiness(business);
-    setEditModalOpen(true);
-  };
+  // Mutation for deleting a business
+  const deleteMutation = useMutation({
+    mutationFn: deleteBusiness,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["businesses"] });
+      setDeleteModalOpen(false);
+      setSuccessMessage("Business deleted successfully!");
+      setTimeout(() => setSuccessMessage(null), 3000); // Clear message after 3 seconds
+    },
+    onError: (error) => {
+      console.error("Error deleting business:", error);
+    },
+  });
 
   const handleDeleteBusiness = (id: string) => {
     setBusinessToDelete(id);
     setDeleteModalOpen(true);
   };
 
-  const handleSaveChanges = async (updatedBusiness: Business) => {
-    try {
-      const response = await getUserBusinesses(session?.user?.id);
-      setBusinesses(response);
-    } catch (error) {
-      console.error("Failed to fetch updated businesses:", error);
-    } finally {
-      setEditModalOpen(false);
+  const confirmDeleteBusiness = () => {
+    if (businessToDelete) {
+      deleteMutation.mutate(businessToDelete);
     }
+  };
+
+  const handleUpdateBusiness = () => {
+    setAddModalOpen(false);
+    setEditModalOpen(false);
+    queryClient.invalidateQueries({ queryKey: ["businesses"] });
+    setSuccessMessage("Business updated successfully!");
+    setTimeout(() => setSuccessMessage(null), 3000); // Clear message after 3 seconds
   };
 
   return (
@@ -181,11 +146,11 @@ const BusinessCRUDPage = () => {
 
         {businesses.length === 0 ? (
           <p style={{ fontSize: "18px", color: "#888", textAlign: "center" }}>
-          No businesses found. <br />
-          <span style={{ color: "#28a745", fontWeight: "bold" }}>
-            Click on "Add Business" to get started!
-          </span>
-        </p>        
+            No businesses found. <br />
+            <span style={{ color: "#28a745", fontWeight: "bold" }}>
+              Click on "Add Business" to get started!
+            </span>
+          </p>
         ) : (
           <div
             style={{
@@ -194,9 +159,9 @@ const BusinessCRUDPage = () => {
               gap: "20px",
             }}
           >
-            {businesses.map((business, index) => (
+            {businesses.map((business: Business) => (
               <Card
-                key={`${business._id}-${index}`}
+                key={business._id}
                 style={{
                   backgroundColor: "#FFFFFF",
                   borderRadius: "10px",
@@ -242,7 +207,10 @@ const BusinessCRUDPage = () => {
                         fontFamily: "PPGoshaBold, sans-serif",
                         marginRight: "10px",
                       }}
-                      onClick={() => handleEditBusiness(business)}
+                      onClick={() => {
+                        setSelectedBusiness(business);
+                        setEditModalOpen(true);
+                      }}
                     >
                       Edit
                     </Button>
@@ -267,14 +235,15 @@ const BusinessCRUDPage = () => {
 
       {isAddModalOpen && (
         <AddBusinessModal
-          isOpen={isAddModalOpen}
-          onClose={() => {
-            setAddModalOpen(false);
-            setSelectedBusiness(null);
-          }}
-          onSubmit={handleAddOrUpdateBusiness}
-          categories={categories}
-        />
+        isOpen={isAddModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        onSuccessMessage={(message: string) => {
+          setSuccessMessage(message);
+          setTimeout(() => setSuccessMessage(null), 3000); // Clear after 3 seconds
+        }}
+        categories={categories}
+      />
+      
       )}
 
       {isEditModalOpen && selectedBusiness && (
@@ -285,7 +254,7 @@ const BusinessCRUDPage = () => {
             setSelectedBusiness(null);
           }}
           business={selectedBusiness}
-          onSave={handleSaveChanges}
+          onSave={handleUpdateBusiness}
           categories={categories}
         />
       )}

@@ -288,12 +288,13 @@ const EditBusinessModal = ({
             </Button>
             <Button
               style={{
-                backgroundColor: "#04b54e",
+                backgroundColor: hasChanges ? "#04b54e" : "#d3d3d3", // Gray when disabled
                 color: "#FFFFFF",
                 fontFamily: "PPGoshaBold, sans-serif",
                 width: "120px",
               }}
               onClick={handleSaveClick}
+              disabled={!hasChanges} // Disable button if no changes
             >
               Save Changes
             </Button>

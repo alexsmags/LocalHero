@@ -30,7 +30,7 @@ interface Category {
   _id: string;
   name: string;
 }
-export default function AddBusinessModal({ isOpen, onClose, categories }: any) {
+export default function AddBusinessModal({ isOpen, onClose, categories, onSuccessMessage }: any) {
   const [formData, setFormData] = useReducer(formReducer, {
     name: "",
     category: "",
@@ -60,13 +60,13 @@ export default function AddBusinessModal({ isOpen, onClose, categories }: any) {
     mutationFn: addBusiness,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["businesses"] });
+      onSuccessMessage("Business added successfully!"); // Notify parent
       handleModalClose();
     },
     onError: (error) => {
       console.error("Error adding business:", error);
     },
   });
-
   const handler = useCallback(() => {
     dispatch(toggleChangeAction());
   }, [dispatch]);
