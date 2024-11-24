@@ -1,22 +1,20 @@
 'use client'
 
-import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Input, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar} from "@nextui-org/react";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar } from "@nextui-org/react";
 import Image from "next/image";
 import LogoLocalHero from "../../public/images/LocalHero_logo_no_background.png";
-import { CiSearch } from "react-icons/ci";
-import {AvatarIcon} from "@nextui-org/react";
+import { AvatarIcon } from "@nextui-org/react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function App() {
   const { data: session } = useSession();
   const router = useRouter();
-  
 
   return (
-    
-    <Navbar isBordered style={{ backgroundColor: '#04b54e' }}>
-      <NavbarContent justify="start">
+    <Navbar isBordered style={{ backgroundColor: "#04b54e" }}>
+      {/* Navbar Start - Logo */}
+      <NavbarContent justify="start" className="flex-shrink-0">
         <NavbarBrand className="mr-4">
           <Link href="/">
             <Image
@@ -25,52 +23,53 @@ export default function App() {
               width={75}
               height={75}
               className="z-20"
-              />
+              priority
+            />
           </Link>
         </NavbarBrand>
-        <NavbarContent className="hidden sm:flex gap-3">
-        <NavbarItem>
-            <Link style={{ fontFamily: 'PPGoshaBold, sans-serif', color: '#FFFFFF' }} href="/">
-              Home
-            </Link>
-          </NavbarItem>
-          <NavbarItem>
-            <Link style={{ fontFamily: 'PPGoshaBold, sans-serif', color: '#FFFFFF' }} href="/businesses">
-              Local Businesses
-            </Link>
-          </NavbarItem>
-          <NavbarItem>
-            <Link style={{ fontFamily: 'PPGoshaBold, sans-serif', color: '#FFFFFF' }} href="/discover">
-              Discover
-            </Link>
-          </NavbarItem>
-          {session?.user?.role == "artisan"  || session?.user?.role == 'businessowner'? (
-            <>
-              <NavbarItem>
-              <Link style={{ fontFamily: 'PPGoshaBold, sans-serif', color: '#FFFFFF' }} href="/tools">
-                Marketing Tools
-              </Link>
-            </NavbarItem>
-            </>
-          ) : (
-          <></>
-          )}
-        </NavbarContent>
       </NavbarContent>
 
-      <NavbarContent as="div" className="items-center" justify="end">
-        <Input
-          classNames={{
-            base: "max-w-full sm:max-w-[12rem] h-10",
-            mainWrapper: "h-full",
-            input: "text-small font-PPGoshaBold", 
-            inputWrapper: "h-full font-normal text-default-500 bg-default-400/20 dark:bg-default-500/20",
-          }}
-          placeholder="Search LocalHero"
-          size="sm"
-          startContent={<CiSearch size={18} />}
-          type="search"
-        />
+      {/* Navbar Center - Links */}
+      <NavbarContent className="hidden md:flex gap-3 flex-grow justify-center">
+        <NavbarItem>
+          <Link style={{ fontFamily: "PPGoshaBold, sans-serif", color: "#FFFFFF" }} href="/">
+            Home
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link style={{ fontFamily: "PPGoshaBold, sans-serif", color: "#FFFFFF" }} href="/businesses">
+            Businesses
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link style={{ fontFamily: "PPGoshaBold, sans-serif", color: "#FFFFFF" }} href="/artisans">
+            Artisans
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link style={{ fontFamily: "PPGoshaBold, sans-serif", color: "#FFFFFF" }} href="/discover">
+            Discover
+          </Link>
+        </NavbarItem>
+        {session?.user?.role === "businessowner" ? (
+          <NavbarItem>
+            <Link style={{ fontFamily: "PPGoshaBold, sans-serif", color: "#FF0000" }} href="/business_tool">
+              Business Management
+            </Link>
+          </NavbarItem>
+        ) : null}
+
+        {session?.user?.role === "artisan" ? (
+          <NavbarItem>
+            <Link style={{ fontFamily: "PPGoshaBold, sans-serif", color: "#FF0000" }} href="/artisan_tool">
+              Artisan Management
+            </Link>
+          </NavbarItem>
+        ) : null}
+      </NavbarContent>
+
+      {/* Navbar End - Avatar and Dropdown */}
+      <NavbarContent className="items-center flex-shrink-0" justify="end">
         <Dropdown placement="bottom-end">
           <DropdownTrigger>
             <Avatar
@@ -82,28 +81,57 @@ export default function App() {
                 base: "bg-gradient-to-br from-[#FFFFFF] to-[#FFFFFF]",
                 icon: "text-black/80",
               }}
-      />
+            />
           </DropdownTrigger>
-          <DropdownMenu aria-label="Profile Actions" variant="flat">
-            <DropdownItem key="profile" className="h-14 gap-2">
-              <p className="font-semibold">Signed in as {session && session.user ? session.user.name : "Guest"} </p>
-              <p className="font-semibold">{session && session.user ? session.user.email : "Guest"}</p>
+          <DropdownMenu
+            aria-label="Profile Actions"
+            variant="flat"
+            className="w-64 bg-white shadow-lg rounded-lg text-gray-800"
+          >
+            <DropdownItem
+              key="profile"
+              className="h-16 flex flex-col items-start gap-1 px-4 py-2 border-b border-gray-200"
+            >
+              <p className="font-semibold text-sm text-gray-600">
+                Signed in as{" "}
+                <span className="text-gray-900">
+                  {session && session.user ? session.user.name : "Guest"}
+                </span>
+              </p>
+              <p className="text-xs text-gray-500">
+                {session && session.user ? `Role: ${session.user.role}` : ""}
+              </p>
+              <p className="text-xs text-gray-500">
+                {session && session.user ? session.user.email : ""}
+              </p>
             </DropdownItem>
-            <DropdownItem key="settings">My Settings</DropdownItem>
-            <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
+
+            <DropdownItem key="settings" className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100">
+              <span className="material-icons text-gray-500">My Settings</span>
+            </DropdownItem>
+
+            <DropdownItem key="help_and_feedback" className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100">
+              <span className="material-icons text-gray-500">Help & Feedback</span>
+            </DropdownItem>
+
             <DropdownItem
               key={session ? "logout" : "login"}
               color={session ? "danger" : "primary"}
+              className={`flex items-center gap-2 px-4 py-3 ${
+                session ? "text-red-500" : "text-blue-500"
+              } hover:bg-gray-100`}
               onPress={async () => {
                 if (session) {
-                  await signOut({ redirect: false }); 
-                  router.push("/login"); 
+                  await signOut({ redirect: false });
+                  router.push("/login");
                 } else {
                   router.push("/login");
                 }
               }}
             >
-             {session ? "Log Out" : "Log In"}
+              <span className="material-icons" style={{ color: "#04b54e" }}>
+                {session ? "Log Out" : "Log In"}
+              </span>
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>

@@ -14,7 +14,14 @@ const {
   addBusiness,
   putBusiness,
   deleteBusiness,
-  getBusinessesFiltered
+  getBusinessesFiltered,
+  getArtisans,
+  getUserArtisans,
+  getArtisan,
+  addArtisan,
+  putArtisan,
+  deleteArtisan,
+  getArtisansFiltered
 } = require("./controller.js");
 
 const dev = process.env.NODE_ENV !== "production";
@@ -77,7 +84,6 @@ app.prepare().then(() => {
   });
 
   server.post("/api/business", (req, res) => {
-    console.log("Received business payload:", req.body)
     addBusiness(req, res);
   });
 
@@ -93,6 +99,44 @@ app.prepare().then(() => {
     const { term, categoryType } = req.query;
 
     getBusinessesFiltered(req, res, {
+      term,
+      categoryType
+    });
+  });
+
+
+  
+  //---------------------------------------------------------------
+  //For artisans
+  //---------------------------------------------------------------
+  server.get("/api/artisan", (req, res) => {
+    getArtisans(req, res);
+  });
+
+  server.get("/api/userartisan/:userID", (req, res) => {
+    getUserArtisans(req, res);
+  });
+  
+  server.get("/api/artisan/:artisanId", (req, res) => {
+    getArtisan(req, res);
+  });
+
+  server.post("/api/artisan", (req, res) => {
+    addArtisan(req, res);
+  });
+
+  server.put("/api/artisan", (req, res) => {
+    putArtisan(req, res);
+  });
+
+  server.delete("/api/artisan", (req, res) => {
+    deleteArtisan(req, res);
+  });
+
+  server.get("/api/artisanfilter", (req, res) => {
+    const { term, categoryType } = req.query;
+
+    getArtisansFiltered(req, res, {
       term,
       categoryType
     });

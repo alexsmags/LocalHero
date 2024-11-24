@@ -7,6 +7,7 @@ import EditBusinessModal from "../../../../components/CRUD - Business/Modals/Mod
 import ConfirmationModal from "../../../../components/CRUD - Business/Modals/ConfirmationModal";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { getUserBusinesses, deleteBusiness } from "../../../../backend/lib/HelperBusiness";
+import {Spinner} from "@nextui-org/react";
 
 interface Business {
   _id: string;
@@ -32,18 +33,22 @@ const BusinessCRUDPage = () => {
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
   const [businessToDelete, setBusinessToDelete] = useState<string | null>(null);
   const [categories] = useState<Category[]>([
-    { _id: "1", name: "Artisans" },
-    { _id: "2", name: "Business" },
-    { _id: "3", name: "Tech" },
-    { _id: "4", name: "Retail" },
-    { _id: "5", name: "Services" },
+    { _id: "1", name: "Food" },
+    { _id: "2", name: "Retail" },
+    { _id: "3", name: "Professional Services" },
+    { _id: "4", name: "Education" },
+    { _id: "5", name: "Home Services" },
+    { _id: "6", name: "Other" },
   ]);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Fetch businesses with React Query
-  const { data: businesses = [], refetch } = useQuery({
+  const { data: businesses = [], isLoading, isFetching } = useQuery({
     queryKey: ["businesses", session?.user?.id],
-    queryFn: () => getUserBusinesses(session?.user?.id),
+    queryFn: async () => {
+      const response = await getUserBusinesses(session?.user?.id);
+      return Array.isArray(response) ? response : []; // Ensure response is an array
+    },
     enabled: !!session?.user?.id, // Ensure query only runs if session.user.id exists
   });
 
@@ -144,7 +149,9 @@ const BusinessCRUDPage = () => {
           </Button>
         </div>
 
-        {businesses.length === 0 ? (
+        {isLoading || isFetching ? (
+          <Spinner color="success"/>
+        ) : Array.isArray(businesses) && businesses.length === 0 ? (
           <p style={{ fontSize: "18px", color: "#888", textAlign: "center" }}>
             No businesses found. <br />
             <span style={{ color: "#28a745", fontWeight: "bold" }}>
@@ -159,91 +166,94 @@ const BusinessCRUDPage = () => {
               gap: "20px",
             }}
           >
-            {businesses.map((business: Business) => (
-              <Card
-                key={business._id}
-                style={{
-                  backgroundColor: "#FFFFFF",
-                  borderRadius: "10px",
-                  boxShadow: "0px 6px 8px rgba(0, 0, 0, 0.15)",
-                  border: "1px solid #e0e0e0",
-                }}
-              >
-                <CardHeader
+            {Array.isArray(businesses) ? (
+              businesses.map((business: Business) => (
+                <Card
+                  key={business._id}
                   style={{
-                    fontFamily: "PPGoshaBold, sans-serif",
-                    fontSize: "18px",
-                    color: "#04b54e",
-                    paddingBottom: "0",
+                    backgroundColor: "#FFFFFF",
+                    borderRadius: "10px",
+                    boxShadow: "0px 6px 8px rgba(0, 0, 0, 0.15)",
+                    border: "1px solid #e0e0e0",
                   }}
                 >
-                  {business.name}
-                </CardHeader>
-                <CardBody>
-                  <p>
-                    <strong>Category:</strong> {business.category}
-                  </p>
-                  <p>
-                    <strong>Description:</strong> {business.description}
-                  </p>
-                  <p>
-                    <strong>Email:</strong> {business.contactEmail}
-                  </p>
-                  <p>
-                    <strong>Location:</strong> {business.location}
-                  </p>
-                  <div
+                  <CardHeader
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginTop: "15px",
+                      fontFamily: "PPGoshaBold, sans-serif",
+                      fontSize: "18px",
+                      color: "#04b54e",
+                      paddingBottom: "0",
                     }}
                   >
-                    <Button
-                      size="sm"
+                    {business.name}
+                  </CardHeader>
+                  <CardBody>
+                    <p>
+                      <strong>Category:</strong> {business.category}
+                    </p>
+                    <p>
+                      <strong>Description:</strong> {business.description}
+                    </p>
+                    <p>
+                      <strong>Email:</strong> {business.contactEmail}
+                    </p>
+                    <p>
+                      <strong>Location:</strong> {business.location}
+                    </p>
+                    <div
                       style={{
-                        backgroundColor: "#FFC107",
-                        color: "#000000",
-                        fontFamily: "PPGoshaBold, sans-serif",
-                        marginRight: "10px",
-                      }}
-                      onClick={() => {
-                        setSelectedBusiness(business);
-                        setEditModalOpen(true);
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginTop: "15px",
                       }}
                     >
-                      Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      style={{
-                        backgroundColor: "#DC3545",
-                        color: "#FFFFFF",
-                        fontFamily: "PPGoshaBold, sans-serif",
-                      }}
-                      onClick={() => handleDeleteBusiness(business._id)}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </CardBody>
-              </Card>
-            ))}
+                      <Button
+                        size="sm"
+                        style={{
+                          backgroundColor: "#FFC107",
+                          color: "#000000",
+                          fontFamily: "PPGoshaBold, sans-serif",
+                          marginRight: "10px",
+                        }}
+                        onClick={() => {
+                          setSelectedBusiness(business);
+                          setEditModalOpen(true);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        style={{
+                          backgroundColor: "#DC3545",
+                          color: "#FFFFFF",
+                          fontFamily: "PPGoshaBold, sans-serif",
+                        }}
+                        onClick={() => handleDeleteBusiness(business._id)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </CardBody>
+                </Card>
+              ))
+            ) : (
+              <p>No businesses available or invalid data format.</p>
+            )}
           </div>
         )}
       </div>
 
       {isAddModalOpen && (
         <AddBusinessModal
-        isOpen={isAddModalOpen}
-        onClose={() => setAddModalOpen(false)}
-        onSuccessMessage={(message: string) => {
-          setSuccessMessage(message);
-          setTimeout(() => setSuccessMessage(null), 3000); // Clear after 3 seconds
-        }}
-        categories={categories}
-      />
-      
+          isOpen={isAddModalOpen}
+          onClose={() => setAddModalOpen(false)}
+          onSuccessMessage={(message: string) => {
+            setSuccessMessage(message);
+            setTimeout(() => setSuccessMessage(null), 3000); // Clear after 3 seconds
+          }}
+          categories={categories}
+        />
       )}
 
       {isEditModalOpen && selectedBusiness && (

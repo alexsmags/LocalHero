@@ -3,14 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { Card, Button } from '@nextui-org/react';
 import { AiOutlineClose, AiOutlineSearch } from "react-icons/ai";
 import { useRouter, useSearchParams } from 'next/navigation';
-import { getBusinessesFiltered } from "../../../../backend/lib/HelperBusiness";
+import { getArtisanssFiltered } from "../../../../backend/lib/HelperArtisan";
 import {Spinner} from "@nextui-org/react";
 
-interface Business {
+interface Artisan {
   _id: string;
   name: string;
-  category: string;
-  description: string;
+  skills: string[];
+  bio: string;
   image?: string;
   website?: string;
   contactEmail: string;
@@ -21,23 +21,23 @@ interface Business {
   updatedAt: string;
 }
 
-const LocalBusinessesPage = () => {
+const LocalArtisansPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [businesses, setBusinesses] = useState<Business[]>([]);
+  const [artisans, setArtisans] = useState<Artisan[]>([]);
   const [searchTerm, setSearchTerm] = useState(searchParams.get("term") || "");
-  const [filterCategory, setFilterCategory] = useState(searchParams.get("category") || "");
+  const [filterSkill, setFilterSkill] = useState(searchParams.get("skill") || "");
   const [loading, setLoading] = useState(true);
   const [focused, setFocused] = useState(false); // State to track input focus
 
-  const fetchBusinesses = async (filters: Record<string, string>) => {
+  const fetchArtisans = async (filters: Record<string, string>) => {
     setLoading(true);
     try {
-      const data = await getBusinessesFiltered(filters);
-      setBusinesses(data);
+      const data = await getArtisanssFiltered(filters);
+      setArtisans(data);
     } catch (error) {
-      console.log("Failed to fetch businesses:", error);
+      console.log("Failed to fetch artisans:", error);
     } finally {
       setLoading(false);
     }
@@ -46,31 +46,31 @@ const LocalBusinessesPage = () => {
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (searchTerm) params.append("term", searchTerm);
-    if (filterCategory) params.append("category", filterCategory);
+    if (filterSkill) params.append("skill", filterSkill);
 
     router.push(`?${params.toString()}`);
-    fetchBusinesses(Object.fromEntries(params.entries()));
+    fetchArtisans(Object.fromEntries(params.entries()));
   };
 
   const clearSearchTerm = () => {
-    setSearchTerm(""); 
+    setSearchTerm("");
   };
 
-  const clearCategoryFilter = () => {
-    setFilterCategory(""); 
+  const clearSkillFilter = () => {
+    setFilterSkill("");
     const params = new URLSearchParams();
     if (searchTerm) params.append("term", searchTerm);
 
     router.push(`?${params.toString()}`);
-    fetchBusinesses(Object.fromEntries(params.entries()));
+    fetchArtisans(Object.fromEntries(params.entries()));
   };
 
   useEffect(() => {
     const filters: Record<string, string> = {};
     if (searchParams.get("term")) filters.term = searchParams.get("term")!;
-    if (searchParams.get("category")) filters.category = searchParams.get("category")!;
+    if (searchParams.get("skill")) filters.skill = searchParams.get("skill")!;
 
-    fetchBusinesses(filters);
+    fetchArtisans(filters);
   }, [searchParams]);
 
   return (
@@ -94,15 +94,15 @@ const LocalBusinessesPage = () => {
         }}
       >
         <span style={{ fontSize: '16px', fontWeight: 'bold', marginRight: '20px' }}>
-          {businesses.length} results
+          {artisans.length} results
         </span>
         <div style={{ position: 'relative', flex: '1', display: 'flex', alignItems: 'center' }}>
           <input
             type="text"
-            placeholder="Search for businesses..."
+            placeholder="Search for artisans..."
             value={searchTerm}
-            onFocus={() => setFocused(true)} 
-            onBlur={() => setTimeout(() => setFocused(false), 100)} 
+            onFocus={() => setFocused(true)}
+            onBlur={() => setTimeout(() => setFocused(false), 100)}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
               width: '100%',
@@ -114,7 +114,7 @@ const LocalBusinessesPage = () => {
               paddingRight: '50px',
             }}
           />
-          {searchTerm && focused && ( 
+          {searchTerm && focused && (
             <AiOutlineClose
               onClick={clearSearchTerm}
               style={{
@@ -146,15 +146,15 @@ const LocalBusinessesPage = () => {
           </button>
         </div>
         <select
-          value={filterCategory}
+          value={filterSkill}
           onChange={(e) => {
-            setFilterCategory(e.target.value);
+            setFilterSkill(e.target.value);
             const params = new URLSearchParams();
             if (searchTerm) params.append("term", searchTerm);
-            if (e.target.value) params.append("category", e.target.value);
+            if (e.target.value) params.append("skill", e.target.value);
 
             router.push(`?${params.toString()}`);
-            fetchBusinesses(Object.fromEntries(params.entries())); // Trigger API call immediately
+            fetchArtisans(Object.fromEntries(params.entries())); // Trigger API call immediately
           }}
           style={{
             padding: '10px 15px',
@@ -166,19 +166,50 @@ const LocalBusinessesPage = () => {
             marginLeft: '10px',
           }}
         >
-          <option value="">All Categories</option>
-          <option value="Food">Food and Beverage</option>
-          <option value="Retail">Retail and Shopping</option>
-          <option value="Professional Services">Personal and Professional Services</option>
-          <option value="Education">Education and Childcare</option>
-          <option value="Home Services">Home Services</option>
+          <option value="">All Skills</option>
+          <option value="Woodworking">Woodworking</option>
+          <option value="Pottery">Pottery</option>
+          <option value="Painting">Painting</option>
+          <option value="Sculpting">Sculpting</option>
+          <option value="Jewelry Making">Jewelry Making</option>
+          <option value="Weaving">Weaving</option>
+          <option value="Embroidery">Embroidery</option>
+          <option value="Leather Crafting">Leather Crafting</option>
+          <option value="Metalworking">Metalworking</option>
+          <option value="Calligraphy">Calligraphy</option>
+          <option value="Graphic Design">Graphic Design</option>
+          <option value="Furniture Making">Furniture Making</option>
+          <option value="Tailoring">Tailoring</option>
+          <option value="Knitting">Knitting</option>
+          <option value="Quilting">Quilting</option>
+          <option value="Glass Blowing">Glass Blowing</option>
+          <option value="Ceramics">Ceramics</option>
+          <option value="Photography">Photography</option>
+          <option value="Illustration">Illustration</option>
+          <option value="Digital Art">Digital Art</option>
+          <option value="Soap Making">Soap Making</option>
+          <option value="Candle Making">Candle Making</option>
+          <option value="Papercraft">Papercraft</option>
+          <option value="Blacksmithing">Blacksmithing</option>
+          <option value="Baking">Baking</option>
+          <option value="Tattoo Art">Tattoo Art</option>
+          <option value="Makeup Artistry">Makeup Artistry</option>
+          <option value="Hair Styling">Hair Styling</option>
+          <option value="Floristry">Floristry</option>
+          <option value="Stonemasonry">Stonemasonry</option>
+          <option value="Mosaic Making">Mosaic Making</option>
+          <option value="Bookbinding">Bookbinding</option>
+          <option value="Basket Weaving">Basket Weaving</option>
+          <option value="Toy Making">Toy Making</option>
+          <option value="Fashion Design">Fashion Design</option>
+          <option value="Screen Printing">Screen Printing</option>
+          <option value="Sign Painting">Sign Painting</option>
           <option value="Other">Other</option>
         </select>
       </form>
 
-
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-        {filterCategory && (
+        {filterSkill && (
           <div
             style={{
               display: 'flex',
@@ -191,22 +222,22 @@ const LocalBusinessesPage = () => {
               fontWeight: '500',
               boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
               cursor: 'pointer',
-              transition: 'background-color 0.2s ease', 
+              transition: 'background-color 0.2s ease',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(4, 181, 78, 1)'; 
-              e.currentTarget.style.color = '#ffffff'; 
+              e.currentTarget.style.backgroundColor = 'rgba(4, 181, 78, 1)';
+              e.currentTarget.style.color = '#ffffff';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(4, 181, 78, 0.2)'; 
-              e.currentTarget.style.color = 'rgba(4, 181, 78, 1)'; 
+              e.currentTarget.style.backgroundColor = 'rgba(4, 181, 78, 0.2)';
+              e.currentTarget.style.color = 'rgba(4, 181, 78, 1)';
             }}
           >
-            <span>{filterCategory}</span>
+            <span>{filterSkill}</span>
             <AiOutlineClose
-               onClick={(e) => {
+              onClick={(e) => {
                 e.stopPropagation();
-                clearCategoryFilter();
+                clearSkillFilter();
               }}
               style={{
                 marginLeft: '5px',
@@ -219,7 +250,6 @@ const LocalBusinessesPage = () => {
         )}
       </div>
 
-
       <div
         style={{
           display: 'flex',
@@ -230,10 +260,10 @@ const LocalBusinessesPage = () => {
       >
         {loading ? (
           <Spinner color="success"/>
-        ) : businesses.length > 0 ? (
-          businesses.map((business) => (
+        ) : artisans.length > 0 ? (
+          artisans.map((artisan) => (
             <Card
-              key={business._id}
+              key={artisan._id}
               style={{
                 maxWidth: '300px',
                 width: '100%',
@@ -244,21 +274,21 @@ const LocalBusinessesPage = () => {
               }}
             >
               <img
-                src={business.image || 'https://via.placeholder.com/300x150?text=Business+Image'}
-                alt={business.name}
+                src={artisan.image || 'https://via.placeholder.com/300x150?text=Artisan+Image'}
+                alt={artisan.name}
                 style={{ width: '100%', height: '150px', objectFit: 'cover' }}
               />
               <div style={{ padding: '15px' }}>
-                <h3 style={{ margin: '0 0 10px', fontSize: '18px' }}>{business.name}</h3>
-                <p style={{ margin: '0 0 5px', fontSize: '14px', color: '#555' }}>{business.description}</p>
-                <p><b>Category:</b> {business.category}</p>
-                <p><b>Location:</b> {business.location}</p>
-                <p><b>Email:</b> {business.contactEmail}</p>
-                {business.phone && <p><b>Phone:</b> {business.phone}</p>}
-                {business.website && (
+                <h3 style={{ margin: '0 0 10px', fontSize: '18px' }}>{artisan.name}</h3>
+                <p style={{ margin: '0 0 5px', fontSize: '14px', color: '#555' }}>{artisan.bio}</p>
+                <p><b>Skills:</b> {artisan.skills.join(", ")}</p>
+                <p><b>Location:</b> {artisan.location}</p>
+                <p><b>Email:</b> {artisan.contactEmail}</p>
+                {artisan.phone && <p><b>Phone:</b> {artisan.phone}</p>}
+                {artisan.website && (
                   <Button
                     size="sm"
-                    onClick={() => window.open(business.website, '_blank')}
+                    onClick={() => window.open(artisan.website, '_blank')}
                     style={{
                       backgroundColor: '#28a745',
                       color: '#fff',
@@ -274,11 +304,11 @@ const LocalBusinessesPage = () => {
             </Card>
           ))
         ) : (
-          <p style={{ fontSize: '18px', color: '#888' }}>No businesses found.</p>
+          <p style={{ fontSize: '18px', color: '#888' }}>No artisans found.</p>
         )}
       </div>
     </div>
   );
 };
 
-export default LocalBusinessesPage;
+export default LocalArtisansPage;

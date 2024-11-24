@@ -1,6 +1,7 @@
 /**Controller */
 const Users = require("../../src/app/model/user");
 const Businesses = require("../../src/app/model/business");
+const Artisans = require("../../src/app/model/artisan");
 const mongoose = require("mongoose");
 
 
@@ -143,7 +144,7 @@ async function getBusiness(req, res) {
     const { businessId } = req.params;
 
     if (businessId) {
-      const business = await Businesses.findById(propertyId);
+      const business = await Businesses.findById(businessId);
       if (business) {
         res.status(200).json(business);
       } else {
@@ -185,7 +186,7 @@ async function addBusiness(req, res) {
 
 
 
-//Updating a specific property based on ID
+//Updating a specific business based on ID
 async function putBusiness(req, res) {
   try {
     const { businessId } = req.query;
@@ -248,6 +249,163 @@ const getBusinessesFiltered = async (req, res) => {
 
 
 
+
+//---------------------------------------------------------------------------------------------
+//Artisan database here
+//---------------------------------------------------------------------------------------------
+
+
+//get the artisans 
+async function getArtisans(req, res) {
+  try {
+    const artisan = await Artisans.find({});
+    if (!artisan) {
+      return res.status(404).json({ error: "Data not Found" });
+    }
+    res.status(200).json(artisan);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+// get the artisans for the user in session
+async function getUserArtisans(req, res) {
+  try {
+    const { userID } = req.params;
+
+    // Ensure userID is a valid ObjectId
+    if (!userID || !mongoose.Types.ObjectId.isValid(userID)) {
+      return res.status(400).json({ error: "Invalid or missing user ID" });
+    }
+
+    // Convert userID to an ObjectId
+    const objectId = new mongoose.Types.ObjectId(userID);
+
+    // Query artisans where the owner matches the userID
+    const artisans = await Artisans.find({ owner: objectId });
+
+    if (!artisans || artisans.length === 0) {
+      return res.status(404).json({ error: "Data not found" });
+    }
+
+    res.status(200).json(artisans);
+  } catch (error) {
+    console.error("Error fetching artisans:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+async function getArtisan(req, res) {
+  try {
+    const { artisanId } = req.params;
+
+    if (artisanId) {
+      const artisan = await Artisans.findById(artisanId);
+      if (artisan) {
+        res.status(200).json(artisan);
+      } else {
+        res.status(404).json({ error: "Artisan not found" });
+      }
+    } else {
+      res.status(400).json({ error: "Artisan ID not selected" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Cannot get Artisan" });
+  }
+}
+
+//Adding Artisan
+async function addArtisan(req, res) {
+  try {
+    const formData = req.body;
+
+    if (!formData) {
+      return res.status(404).json({ error: "Form Data Not Provided" });
+    }
+
+    // Log the collection name being used
+    console.log("Collection name:", Artisans.collection.name);
+
+    // Create the new artisan entry
+    const newArtisan = await Artisans.create(formData);
+
+    console.log("Inserted Artisan into DB:", newArtisan);
+
+    return res.status(201).json({ success: true, data: newArtisan });
+  } catch (error) {
+    // Log any errors for debugging
+    console.error("Error adding Artisan:", error.message);
+
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+
+
+//Updating a specific artisan based on ID
+async function putArtisan(req, res) {
+  try {
+    const { artisanId } = req.query;
+    const formData = req.body;
+
+    if (artisanId && formData) {
+      const artisan = await Artisans.findByIdAndUpdate(artisanId, formData);
+      res.status(200).json(artisan);
+    } else {
+      res.status(404).json({ error: "Artisan Not Selected" });
+    }
+  } catch (error) {
+    res.status(404).json({ error: "Error while updating the Artisan" });
+  }
+}
+
+
+async function deleteArtisan(req, res) {
+  try {
+    const { artisanId } = req.query;
+
+    if (artisanId) {
+      const artisan = await Artisans.findByIdAndDelete(artisanId);
+      return res.status(200).json(artisan);
+    } else {
+      res.status(404).json({ error: "Artisan not selected" });
+    }
+  } catch (error) {
+    res.status(404).json({ error: "Error while deleting Artisan" });
+  }
+}
+
+const getArtisansFiltered = async (req, res) => {
+  try {
+    const filters = req.query; 
+    let query = {};
+
+    if (filters.term) {
+      const searchRegex = new RegExp(filters.term, "i"); 
+      query.$or = [
+        { name: searchRegex },
+        { bio: searchRegex },
+        { skills: { $regex: searchRegex } }, 
+      ];
+    }
+
+    if (filters.skill) {
+      query.skills = { $elemMatch: { $regex: new RegExp(filters.skill, "i") } }; 
+    }
+
+    const artisans = await Artisans.find(query).sort({ createdAt: -1 }); 
+    res.status(200).json(artisans);
+  } catch (error) {
+    console.error("Error fetching artisans:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+
+
+
   module.exports = {
     getUsers: getUsers,
     getUser: getUser,
@@ -261,5 +419,12 @@ const getBusinessesFiltered = async (req, res) => {
     addBusiness: addBusiness,
     putBusiness: putBusiness,
     deleteBusiness: deleteBusiness,
-    getBusinessesFiltered: getBusinessesFiltered
+    getBusinessesFiltered: getBusinessesFiltered,
+    getArtisans: getArtisans,
+    getUserArtisans: getUserArtisans,
+    getArtisan: getArtisan,
+    addArtisan: addArtisan,
+    putArtisan: putArtisan,
+    deleteArtisan: deleteArtisan,
+    getArtisansFiltered: getArtisansFiltered
   };

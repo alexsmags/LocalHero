@@ -1,8 +1,9 @@
 import React, { useReducer, useState, useCallback, useEffect } from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
-import { addBusiness } from "../../../backend/lib/HelperBusiness";
+import { addArtisan } from "../../../backend/lib/HelperArtisan";
 import { toggleChangeAction } from "../../../backend/redux/reducer";
+import SkillsInput from "../skills"; // Assuming SkillsInput is properly imported
 import {
   Modal,
   ModalContent,
@@ -11,8 +12,6 @@ import {
   ModalHeader,
   Button,
   Input,
-  Select,
-  SelectItem,
   Textarea,
 } from "@nextui-org/react";
 
@@ -26,20 +25,18 @@ const formReducer = (state: any, event: any) => {
     [event.target.name]: event.target.value,
   };
 };
-interface Category {
-  _id: string;
-  name: string;
-}
-export default function AddBusinessModal({ isOpen, onClose, categories, onSuccessMessage }: any) {
+
+export default function AddArtisanModal({ isOpen, onClose, onSuccessMessage }: any) {
   const [formData, setFormData] = useReducer(formReducer, {
     name: "",
-    category: "",
-    description: "",
+    skills: "",
+    bio: "",
     imageUrl: "",
     website: "",
     contactEmail: "",
     phone: "",
     location: "",
+    socialMedia: "",
   });
 
   const [formErrors, setFormErrors] = useState<any>({});
@@ -57,26 +54,22 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
   }, []);
 
   const addMutation = useMutation({
-    mutationFn: addBusiness,
+    mutationFn: addArtisan,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["businesses"] });
-      onSuccessMessage("Business added successfully!"); // Notify parent
+      queryClient.invalidateQueries({ queryKey: ["artisans"] });
+      onSuccessMessage("Artisan added successfully!");
       handleModalClose();
     },
     onError: (error) => {
-      console.error("Error adding business:", error);
+      console.error("Error adding artisan:", error);
     },
   });
-  const handler = useCallback(() => {
-    dispatch(toggleChangeAction());
-  }, [dispatch]);
 
   const validateForm = () => {
     const errors: any = {};
-    if (!formData.name.trim()) errors.name = "Business name is required";
-    if (!formData.category.trim()) errors.category = "Category is required";
-    if (!formData.description.trim())
-      errors.description = "Description is required";
+    if (!formData.name.trim()) errors.name = "Artisan name is required";
+    if (!formData.skills.trim()) errors.skills = "At least one skill is required";
+    if (!formData.bio.trim()) errors.bio = "Bio is required";
     if (!formData.contactEmail.trim())
       errors.contactEmail = "Email is required";
     else if (!/.+@.+\..+/.test(formData.contactEmail))
@@ -91,7 +84,9 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
-
+  const handleSkillsChange = useCallback((skills: string[]) => {
+    setFormData({ target: { name: "skills", value: skills.join(",") } });
+  }, []); // Ensure dependencies are stable
   const handleSubmit = (e: any) => {
     e.preventDefault();
 
@@ -99,13 +94,14 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
 
     const model = {
       name: formData.name,
-      category: formData.category,
-      description: formData.description,
+      skills: formData.skills.split(",").map((skill: string) => skill.trim()), // Convert skills to array
+      bio: formData.bio,
       imageUrl: formData.imageUrl,
       website: formData.website,
       contactEmail: formData.contactEmail,
       phone: formData.phone,
       location: formData.location,
+      socialMedia: formData.socialMedia.split(",").map((link: string) => link.trim()), // Convert social media links to array
       owner: userId,
     };
 
@@ -113,9 +109,9 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
   };
 
   const handleModalClose = () => {
-    setFormData({}); 
-    setFormErrors({}); 
-    onClose(); 
+    setFormData({});
+    setFormErrors({});
+    onClose();
   };
 
   const renderError = (field: string) =>
@@ -134,14 +130,26 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
       }}
     >
       <ModalContent>
-        <ModalHeader style={{ fontFamily: "PPGoshaBold, sans-serif", color: "#04b54e" }}>
-          Add New Business
+        <ModalHeader
+          style={{
+            fontFamily: "PPGoshaBold, sans-serif",
+            color: "#04b54e",
+          }}
+        >
+          Add New Artisan
         </ModalHeader>
-        <ModalBody>
+        <ModalBody
+          style={{
+            maxHeight: "700px", // Limit modal body height
+            overflowY: "auto", // Enable scrolling for long content
+            backgroundColor: "#f9f9f9",
+            padding: "20px",
+          }}
+        >
           <Input
             name="name"
-            label="Business Name"
-            placeholder="Enter the business name"
+            label="Artisan Name"
+            placeholder="Enter the artisan's name"
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
@@ -155,53 +163,27 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
           />
           {renderError("name")}
 
-          <Select
-            name="category"
-            label="Category"
-            placeholder="Select a category"
-            fullWidth
-            style={{
-              backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
-              borderColor: formErrors.category ? "red" : undefined,
-            }}
-            onChange={(selectedValue) => {
-              const selectedId = selectedValue.target.value;
-              const selectedCategory = categories.find((cat: Category) => cat._id === selectedId);
-              const selectedCategoryName = selectedCategory?.name || ""; 
-              setFormData({ target: { name: "category", value: selectedCategoryName } });
-            }}
-            value={formData.category}
-          >
-            {categories.map((cat: any) => (
-              <SelectItem
-                key={cat._id}
-                value={cat.name}
-                style={{ fontFamily: "PPGoshaBold, sans-serif", padding: "5px 10px" }}
-              >
-                {cat.name}
-              </SelectItem>
-            ))}
-          </Select>
-
-          {renderError("category")}
+          <SkillsInput
+            onChange={handleSkillsChange}
+          />
+          {renderError("skills")}
 
           <Textarea
-            name="description"
-            label="Description"
-            placeholder="Provide a brief description of the business"
+            name="bio"
+            label="Bio"
+            placeholder="Provide a brief bio of the artisan"
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
               fontFamily: "PPGoshaBold, sans-serif",
-              borderColor: formErrors.description ? "red" : undefined,
+              borderColor: formErrors.bio ? "red" : undefined,
             }}
-            value={formData.description}
+            value={formData.bio}
             onChange={(e) =>
               setFormData({ target: { name: e.target.name, value: e.target.value } })
             }
           />
-          {renderError("description")}
+          {renderError("bio")}
 
           <Input
             name="imageUrl"
@@ -222,7 +204,7 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
           <Input
             name="website"
             label="Website"
-            placeholder="Enter the business website (optional)"
+            placeholder="Enter the artisan's website (optional)"
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
@@ -275,7 +257,7 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
           <Input
             name="location"
             label="Location"
-            placeholder="Enter business location"
+            placeholder="Enter artisan's location"
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
@@ -288,6 +270,22 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
             }
           />
           {renderError("location")}
+
+          <Textarea
+            name="socialMedia"
+            label="Social Media Links"
+            placeholder="Enter social media links, separated by commas (optional)"
+            fullWidth
+            style={{
+              backgroundColor: "#f9f9f9",
+              fontFamily: "PPGoshaBold, sans-serif",
+            }}
+            value={formData.socialMedia}
+            onChange={(e) =>
+              setFormData({ target: { name: e.target.name, value: e.target.value } })
+            }
+          />
+          {renderError("socialMedia")}
         </ModalBody>
         <ModalFooter style={{ justifyContent: "space-between", gap: "10px" }}>
           <Button
@@ -311,7 +309,7 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
             }}
             onClick={handleSubmit}
           >
-            Add Business
+            Add Artisan
           </Button>
         </ModalFooter>
       </ModalContent>
