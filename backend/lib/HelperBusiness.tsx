@@ -84,3 +84,12 @@ export async function deleteBusiness(businessId: any) {
   const json = await response.json();
   return json;
 }
+
+// Get filtered businesses
+export const getBusinessesFiltered = async (filters = {}) => {
+  const response = await fetch(
+    `${BASE_URL}/api/businessfilter?${new URLSearchParams(filters)}`
+  );
+  const json = await response.json();
+  return json;
+};

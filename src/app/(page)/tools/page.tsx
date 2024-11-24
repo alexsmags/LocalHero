@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { Button, Card, CardBody, CardHeader } from "@nextui-org/react";
 import AddBusinessModal from "../../../../components/CRUD - Business/Modals/ModalAddBusiness";
 import EditBusinessModal from "../../../../components/CRUD - Business/Modals/ModalEditBusiness";
+import ConfirmationModal from "../../../../components/CRUD - Business/Modals/ConfirmationModal";
 import { getUserBusinesses, deleteBusiness } from "../../../../backend/lib/HelperBusiness";
 
 interface Business {
@@ -25,8 +26,26 @@ const BusinessCRUDPage = () => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
+  const [businessToDelete, setBusinessToDelete] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadCategories = () => {
+      const hardcodedCategories: Category[] = [
+        { _id: "1", name: "Artisans" },
+        { _id: "2", name: "Business" },
+        { _id: "3", name: "Tech" },
+        { _id: "4", name: "Retail" },
+        { _id: "5", name: "Services" },
+      ];
+      setCategories(hardcodedCategories);
+    };
+
+    loadCategories();
+  }, []);
 
   useEffect(() => {
     const fetchBusinesses = async () => {
@@ -59,18 +78,30 @@ const BusinessCRUDPage = () => {
     setSelectedBusiness(null);
   };
 
-  const handleDeleteBusiness = async (id: string) => {
-    try {
-      await deleteBusiness(id);
-      setBusinesses((prev) => prev.filter((b) => b._id !== id));
-    } catch (error) {
-      console.error("Failed to delete business:", error);
+  const confirmDeleteBusiness = async () => {
+    if (businessToDelete) {
+      try {
+        await deleteBusiness(businessToDelete);
+        setBusinesses((prev) => prev.filter((b) => b._id !== businessToDelete));
+        setSuccessMessage("Business deleted successfully!");
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } catch (error) {
+        console.error("Failed to delete business:", error);
+      } finally {
+        setDeleteModalOpen(false);
+        setBusinessToDelete(null);
+      }
     }
   };
 
   const handleEditBusiness = (business: Business) => {
     setSelectedBusiness(business);
     setEditModalOpen(true);
+  };
+
+  const handleDeleteBusiness = (id: string) => {
+    setBusinessToDelete(id);
+    setDeleteModalOpen(true);
   };
 
   const handleSaveChanges = async (updatedBusiness: Business) => {
@@ -92,6 +123,22 @@ const BusinessCRUDPage = () => {
         minHeight: "100vh",
       }}
     >
+      {successMessage && (
+        <div
+          style={{
+            backgroundColor: "#D4EDDA",
+            color: "#155724",
+            border: "1px solid #C3E6CB",
+            borderRadius: "8px",
+            padding: "10px 20px",
+            marginBottom: "20px",
+            fontFamily: "Arial, sans-serif",
+            fontSize: "14px",
+          }}
+        >
+          {successMessage}
+        </div>
+      )}
       <div
         style={{
           backgroundColor: "#FFFFFF",
@@ -132,81 +179,90 @@ const BusinessCRUDPage = () => {
           </Button>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-            gap: "20px",
-          }}
-        >
-          {businesses.map((business, index) => (
-            <Card
-              key={`${business._id}-${index}`}
-              style={{
-                backgroundColor: "#FFFFFF",
-                borderRadius: "10px",
-                boxShadow: "0px 6px 8px rgba(0, 0, 0, 0.15)",
-                border: "1px solid #e0e0e0",
-              }}
-            >
-              <CardHeader
+        {businesses.length === 0 ? (
+          <p style={{ fontSize: "18px", color: "#888", textAlign: "center" }}>
+          No businesses found. <br />
+          <span style={{ color: "#28a745", fontWeight: "bold" }}>
+            Click on "Add Business" to get started!
+          </span>
+        </p>        
+        ) : (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+              gap: "20px",
+            }}
+          >
+            {businesses.map((business, index) => (
+              <Card
+                key={`${business._id}-${index}`}
                 style={{
-                  fontFamily: "PPGoshaBold, sans-serif",
-                  fontSize: "18px",
-                  color: "#04b54e",
-                  paddingBottom: "0",
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: "10px",
+                  boxShadow: "0px 6px 8px rgba(0, 0, 0, 0.15)",
+                  border: "1px solid #e0e0e0",
                 }}
               >
-                {business.name}
-              </CardHeader>
-              <CardBody>
-                <p>
-                  <strong>Category:</strong> {business.category}
-                </p>
-                <p>
-                  <strong>Description:</strong> {business.description}
-                </p>
-                <p>
-                  <strong>Email:</strong> {business.contactEmail}
-                </p>
-                <p>
-                  <strong>Location:</strong> {business.location}
-                </p>
-                <div
+                <CardHeader
                   style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginTop: "15px",
+                    fontFamily: "PPGoshaBold, sans-serif",
+                    fontSize: "18px",
+                    color: "#04b54e",
+                    paddingBottom: "0",
                   }}
                 >
-                  <Button
-                    size="sm"
+                  {business.name}
+                </CardHeader>
+                <CardBody>
+                  <p>
+                    <strong>Category:</strong> {business.category}
+                  </p>
+                  <p>
+                    <strong>Description:</strong> {business.description}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {business.contactEmail}
+                  </p>
+                  <p>
+                    <strong>Location:</strong> {business.location}
+                  </p>
+                  <div
                     style={{
-                      backgroundColor: "#FFC107",
-                      color: "#000000",
-                      fontFamily: "PPGoshaBold, sans-serif",
-                      marginRight: "10px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginTop: "15px",
                     }}
-                    onClick={() => handleEditBusiness(business)}
                   >
-                    Edit
-                  </Button>
-                  <Button
-                    size="sm"
-                    style={{
-                      backgroundColor: "#DC3545",
-                      color: "#FFFFFF",
-                      fontFamily: "PPGoshaBold, sans-serif",
-                    }}
-                    onClick={() => handleDeleteBusiness(business._id)}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </CardBody>
-            </Card>
-          ))}
-        </div>
+                    <Button
+                      size="sm"
+                      style={{
+                        backgroundColor: "#FFC107",
+                        color: "#000000",
+                        fontFamily: "PPGoshaBold, sans-serif",
+                        marginRight: "10px",
+                      }}
+                      onClick={() => handleEditBusiness(business)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      style={{
+                        backgroundColor: "#DC3545",
+                        color: "#FFFFFF",
+                        fontFamily: "PPGoshaBold, sans-serif",
+                      }}
+                      onClick={() => handleDeleteBusiness(business._id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {isAddModalOpen && (
@@ -231,6 +287,15 @@ const BusinessCRUDPage = () => {
           business={selectedBusiness}
           onSave={handleSaveChanges}
           categories={categories}
+        />
+      )}
+
+      {isDeleteModalOpen && (
+        <ConfirmationModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          onConfirm={confirmDeleteBusiness}
+          message="Are you sure you want to delete this business? This action cannot be undone."
         />
       )}
     </div>

@@ -26,7 +26,10 @@ const formReducer = (state: any, event: any) => {
     [event.target.name]: event.target.value,
   };
 };
-
+interface Category {
+  _id: string;
+  name: string;
+}
 export default function AddBusinessModal({ isOpen, onClose, categories }: any) {
   const [formData, setFormData] = useReducer(formReducer, {
     name: "",
@@ -162,9 +165,12 @@ export default function AddBusinessModal({ isOpen, onClose, categories }: any) {
               fontFamily: "PPGoshaBold, sans-serif",
               borderColor: formErrors.category ? "red" : undefined,
             }}
-            onChange={(event) =>
-              setFormData({ target: { name: "category", value: event.target.value } })
-            }
+            onChange={(selectedValue) => {
+              const selectedId = selectedValue.target.value;
+              const selectedCategory = categories.find((cat: Category) => cat._id === selectedId);
+              const selectedCategoryName = selectedCategory?.name || ""; 
+              setFormData({ target: { name: "category", value: selectedCategoryName } });
+            }}
             value={formData.category}
           >
             {categories.map((cat: any) => (
@@ -177,6 +183,7 @@ export default function AddBusinessModal({ isOpen, onClose, categories }: any) {
               </SelectItem>
             ))}
           </Select>
+
           {renderError("category")}
 
           <Textarea

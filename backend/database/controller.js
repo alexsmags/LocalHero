@@ -218,33 +218,34 @@ async function deleteBusiness(req, res) {
   }
 }
 
-async function getBusinessesFiltered(req, res, filters = {}) {
+const getBusinessesFiltered = async (req, res) => {
   try {
+    const filters = req.query; // Extract query parameters
     let query = {};
 
+    // Text search across name, description, and category
     if (filters.term) {
-      query.address = new RegExp(filters.term, "i"); 
-    }
-    if (filters.saleType) {
-      query.saletype = filters.saleType;
-    }
-    if (filters.propertyType) {
-      query.propertytype = filters.propertyType;
-    }
-
-    if (filters.priceRange) {
-      const [min, max] = filters.priceRange.split("-").map(Number);
-      query.pricetag = { $gte: min, $lte: max };
+      const searchRegex = new RegExp(filters.term, "i"); // Case-insensitive regex
+      query.$or = [
+        { name: searchRegex },
+        { description: searchRegex },
+        { category: searchRegex },
+      ];
     }
 
-    const business = await Properties.find(query);
+    // Exact match for category (optional filter)
+    if (filters.category) {
+      query.category = filters.category;
+    }
 
-    res.status(200).json(business);
+    const businesses = await Businesses.find(query).sort({ createdAt: -1 }); // Sort by newest
+    res.status(200).json(businesses);
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching businesses:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
-}
+};
+
 
 
   module.exports = {
@@ -259,7 +260,6 @@ async function getBusinessesFiltered(req, res, filters = {}) {
     getBusiness: getBusiness,
     addBusiness: addBusiness,
     putBusiness: putBusiness,
-    deleteBusiness: deleteBusiness
-
-
+    deleteBusiness: deleteBusiness,
+    getBusinessesFiltered: getBusinessesFiltered
   };

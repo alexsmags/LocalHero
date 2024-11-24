@@ -13,7 +13,8 @@ const {
   getBusiness,
   addBusiness,
   putBusiness,
-  deleteBusiness
+  deleteBusiness,
+  getBusinessesFiltered
 } = require("./controller.js");
 
 const dev = process.env.NODE_ENV !== "production";
@@ -88,6 +89,14 @@ app.prepare().then(() => {
     deleteBusiness(req, res);
   });
 
+  server.get("/api/businessfilter", (req, res) => {
+    const { term, categoryType } = req.query;
+
+    getBusinessesFiltered(req, res, {
+      term,
+      categoryType
+    });
+  });
 
   //---------------------------------------------------------------
   //For tests
