@@ -5,6 +5,7 @@ import { AiOutlineClose, AiOutlineSearch } from "react-icons/ai";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getArtisanssFiltered } from "../../../../backend/lib/HelperArtisan";
 import { Spinner } from "@nextui-org/react";
+import LocationFilterModal from '../../../../components/Modals/LocationFilterModal';
 
 interface Artisan {
   _id: string;
@@ -32,6 +33,7 @@ const LocalArtisansPage = () => {
   const [searchZipcode, setSearchZipcode] = useState(searchParams.get("zipcode") || "");
   const [loading, setLoading] = useState(true);
   const [focused, setFocused] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
 
   const fetchArtisans = async (filters: Record<string, string>) => {
     setLoading(true);
@@ -56,8 +58,17 @@ const LocalArtisansPage = () => {
     fetchArtisans(Object.fromEntries(params.entries()));
   };
 
-  const clearSearchTerm = () => {
-    setSearchTerm("");
+  const applyLocationFilter = (zipcode: string, radius: number) => {
+    setSearchZipcode(zipcode);
+    setSearchRadius(radius.toString());
+    const params = new URLSearchParams();
+    if (searchTerm) params.append("term", searchTerm);
+    if (filterSkill) params.append("skill", filterSkill);
+    if (zipcode) params.append("zipcode", zipcode);
+    if (radius) params.append("radius", radius.toString());
+
+    router.push(`?${params.toString()}`);
+    fetchArtisans(Object.fromEntries(params.entries()));
   };
 
   const clearSkillFilter = () => {
@@ -137,7 +148,7 @@ const LocalArtisansPage = () => {
           />
           {searchTerm && focused && (
             <AiOutlineClose
-              onClick={clearSearchTerm}
+              onClick={() => setSearchTerm("")}
               style={{
                 position: 'absolute',
                 right: '40px',
@@ -189,7 +200,7 @@ const LocalArtisansPage = () => {
             marginLeft: '10px',
           }}
         >
-          <option value="">All Skills</option>
+             <option value="">All Skills</option>
           <option value="Woodworking">Woodworking</option>
           <option value="Pottery">Pottery</option>
           <option value="Painting">Painting</option>
@@ -229,59 +240,18 @@ const LocalArtisansPage = () => {
           <option value="Sign Painting">Sign Painting</option>
           <option value="Other">Other</option>
         </select>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <input
-            type="text"
-            placeholder="Zipcode"
-            value={searchZipcode}
-            onChange={(e) => {
-              setSearchZipcode(e.target.value);
-              const params = new URLSearchParams();
-              if (searchTerm) params.append("term", searchTerm);
-              if (filterSkill) params.append("skill", filterSkill);
-              if (searchRadius) params.append("radius", searchRadius);
-              if (e.target.value) params.append("zipcode", e.target.value);
-
-              router.push(`?${params.toString()}`);
-              fetchArtisans(Object.fromEntries(params.entries()));
-            }}
-            style={{
-              width: '120px',
-              padding: '10px 15px',
-              borderRadius: '25px',
-              border: '2px solid #28a745',
-              fontSize: '16px',
-              backgroundColor: '#ffffff',
-              outline: 'none',
-            }}
-          />
-          <input
-            type="number"
-            placeholder="Radius (km)"
-            value={searchRadius}
-            onChange={(e) => {
-              setSearchRadius(e.target.value);
-              const params = new URLSearchParams();
-              if (searchTerm) params.append("term", searchTerm);
-              if (filterSkill) params.append("skill", filterSkill);
-              if (e.target.value) params.append("radius", e.target.value);
-              if (searchZipcode) params.append("zipcode", searchZipcode);
-
-              router.push(`?${params.toString()}`);
-              fetchArtisans(Object.fromEntries(params.entries()));
-            }}
-            min="1"
-            style={{
-              width: '120px',
-              padding: '10px 15px',
-              borderRadius: '25px',
-              border: '2px solid #28a745',
-              fontSize: '16px',
-              backgroundColor: '#ffffff',
-              outline: 'none',
-            }}
-          />
-        </div>
+        <Button
+          style={{
+            border: '2px solid #28a745',
+            backgroundColor: 'white',
+            color: '#28a745',
+            borderRadius: '25px',
+            fontWeight: 'bold',
+          }}
+          onClick={() => setModalOpen(true)}
+        >
+          Filter by Location
+        </Button>
       </form>
 
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
@@ -296,35 +266,16 @@ const LocalArtisansPage = () => {
               fontSize: '14px',
               color: '#04b54e',
               fontWeight: '500',
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
               cursor: 'pointer',
-              transition: 'background-color 0.2s ease',
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(4, 181, 78, 1)';
-              e.currentTarget.style.color = '#ffffff';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(4, 181, 78, 0.2)';
-              e.currentTarget.style.color = 'rgba(4, 181, 78, 1)';
-            }}
+            onClick={clearSkillFilter}
           >
             <span>{filterSkill}</span>
             <AiOutlineClose
-              onClick={(e) => {
-                e.stopPropagation();
-                clearSkillFilter();
-              }}
-              style={{
-                marginLeft: '5px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                color: 'inherit',
-              }}
+              style={{ marginLeft: '5px', cursor: 'pointer', fontSize: '14px', color: 'inherit' }}
             />
           </div>
         )}
-
         {(searchRadius && searchZipcode) && (
           <div
             style={{
@@ -336,35 +287,25 @@ const LocalArtisansPage = () => {
               fontSize: '14px',
               color: '#28a745',
               fontWeight: '500',
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
               cursor: 'pointer',
-              transition: 'background-color 0.2s ease',
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(40, 167, 69, 1)';
-              e.currentTarget.style.color = '#ffffff';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';
-              e.currentTarget.style.color = 'rgba(40, 167, 69, 1)';
-            }}
+            onClick={clearRadiusFilter}
           >
             <span>{searchRadius} km around {searchZipcode}</span>
             <AiOutlineClose
-              onClick={(e) => {
-                e.stopPropagation();
-                clearRadiusFilter();
-              }}
-              style={{
-                marginLeft: '5px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                color: 'inherit',
-              }}
+              style={{ marginLeft: '5px', cursor: 'pointer', fontSize: '14px', color: 'inherit' }}
             />
           </div>
         )}
       </div>
+
+      <LocationFilterModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        onApply={applyLocationFilter}
+        initialZipcode={searchZipcode}
+        initialRadius={Number(searchRadius) || 10}
+      />
 
       <div
         style={{
