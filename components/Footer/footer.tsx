@@ -73,7 +73,7 @@ const Footer = () => {
           </a>
           
           <span className="text-sm text-white">
-            © 2023{" "}
+            © 2024{" "}
             <a href="/" className="hover:underline">
               LocalHero™
             </a>
