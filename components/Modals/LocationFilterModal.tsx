@@ -10,11 +10,11 @@ import {
 } from "@nextui-org/react";
 
 interface LocationFilterModalProps {
-  isOpen: boolean; // The visibility state of the modal
-  onClose: () => void; // Function to close the modal
-  onApply: (zipcode: string, radius: number) => void; // Function to apply filters
-  initialZipcode?: string; // Optional initial zipcode
-  initialRadius?: number; // Optional initial radius
+  isOpen: boolean;
+  onClose: () => void;
+  onApply: (zipcode: string, radius: number) => void; 
+  initialZipcode?: string; 
+  initialRadius?: number; 
 }
 
 export default function LocationFilterModal({
@@ -28,7 +28,7 @@ export default function LocationFilterModal({
   const [radius, setRadius] = useState(initialRadius);
   const [formErrors, setFormErrors] = useState({ zipcode: "", radius: "" });
 
-  // Validate inputs before applying filters
+  
   const validateInputs = () => {
     const errors = { zipcode: "", radius: "" };
     let isValid = true;
@@ -47,14 +47,10 @@ export default function LocationFilterModal({
     return isValid;
   };
 
-  // Handle form submission
+
   const handleApplyFilters = () => {
     if (!validateInputs()) return;
-
-    // Trigger parent onApply first
     onApply(zipcode, radius);
-
-    // Then close the modal
     onClose();
   };
 
@@ -76,7 +72,6 @@ export default function LocationFilterModal({
           Filter by Location
         </ModalHeader>
         <ModalBody>
-          {/* Zipcode Input */}
           <Input
             name="zipcode"
             label="Zipcode"
@@ -96,7 +91,6 @@ export default function LocationFilterModal({
             </p>
           )}
 
-          {/* Radius Input */}
           <div style={{ marginTop: "20px" }}>
             <p
               style={{
