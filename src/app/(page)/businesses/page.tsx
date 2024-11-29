@@ -4,7 +4,7 @@ import { Card, Button } from '@nextui-org/react';
 import { AiOutlineClose, AiOutlineSearch } from "react-icons/ai";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getBusinessesFiltered } from "../../../../backend/lib/HelperBusiness";
-import {Spinner} from "@nextui-org/react";
+import { Spinner } from "@nextui-org/react";
 
 interface Business {
   _id: string;
@@ -28,8 +28,10 @@ const LocalBusinessesPage = () => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [searchTerm, setSearchTerm] = useState(searchParams.get("term") || "");
   const [filterCategory, setFilterCategory] = useState(searchParams.get("category") || "");
+  const [searchRadius, setSearchRadius] = useState(searchParams.get("radius") || "");
+  const [searchZipcode, setSearchZipcode] = useState(searchParams.get("zipcode") || "");
   const [loading, setLoading] = useState(true);
-  const [focused, setFocused] = useState(false); // State to track input focus
+  const [focused, setFocused] = useState(false);
 
   const fetchBusinesses = async (filters: Record<string, string>) => {
     setLoading(true);
@@ -47,19 +49,34 @@ const LocalBusinessesPage = () => {
     const params = new URLSearchParams();
     if (searchTerm) params.append("term", searchTerm);
     if (filterCategory) params.append("category", filterCategory);
+    if (searchRadius) params.append("radius", searchRadius);
+    if (searchZipcode) params.append("zipcode", searchZipcode);
 
     router.push(`?${params.toString()}`);
     fetchBusinesses(Object.fromEntries(params.entries()));
   };
 
   const clearSearchTerm = () => {
-    setSearchTerm(""); 
+    setSearchTerm("");
   };
 
   const clearCategoryFilter = () => {
-    setFilterCategory(""); 
+    setFilterCategory("");
     const params = new URLSearchParams();
     if (searchTerm) params.append("term", searchTerm);
+    if (searchRadius) params.append("radius", searchRadius);
+    if (searchZipcode) params.append("zipcode", searchZipcode);
+
+    router.push(`?${params.toString()}`);
+    fetchBusinesses(Object.fromEntries(params.entries()));
+  };
+
+  const clearRadiusFilter = () => {
+    setSearchRadius("");
+    setSearchZipcode("");
+    const params = new URLSearchParams();
+    if (searchTerm) params.append("term", searchTerm);
+    if (filterCategory) params.append("category", filterCategory);
 
     router.push(`?${params.toString()}`);
     fetchBusinesses(Object.fromEntries(params.entries()));
@@ -69,6 +86,8 @@ const LocalBusinessesPage = () => {
     const filters: Record<string, string> = {};
     if (searchParams.get("term")) filters.term = searchParams.get("term")!;
     if (searchParams.get("category")) filters.category = searchParams.get("category")!;
+    if (searchParams.get("radius")) filters.radius = searchParams.get("radius")!;
+    if (searchParams.get("zipcode")) filters.zipcode = searchParams.get("zipcode")!;
 
     fetchBusinesses(filters);
   }, [searchParams]);
@@ -82,6 +101,7 @@ const LocalBusinessesPage = () => {
         }}
         style={{
           display: 'flex',
+          flexWrap: 'wrap',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '15px',
@@ -91,6 +111,7 @@ const LocalBusinessesPage = () => {
           marginBottom: '20px',
           boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
           position: 'relative',
+          gap: '10px'
         }}
       >
         <span style={{ fontSize: '16px', fontWeight: 'bold', marginRight: '20px' }}>
@@ -101,8 +122,8 @@ const LocalBusinessesPage = () => {
             type="text"
             placeholder="Search for businesses..."
             value={searchTerm}
-            onFocus={() => setFocused(true)} 
-            onBlur={() => setTimeout(() => setFocused(false), 100)} 
+            onFocus={() => setFocused(true)}
+            onBlur={() => setTimeout(() => setFocused(false), 100)}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
               width: '100%',
@@ -114,7 +135,7 @@ const LocalBusinessesPage = () => {
               paddingRight: '50px',
             }}
           />
-          {searchTerm && focused && ( 
+          {searchTerm && focused && (
             <AiOutlineClose
               onClick={clearSearchTerm}
               style={{
@@ -152,9 +173,11 @@ const LocalBusinessesPage = () => {
             const params = new URLSearchParams();
             if (searchTerm) params.append("term", searchTerm);
             if (e.target.value) params.append("category", e.target.value);
+            if (searchRadius) params.append("radius", searchRadius);
+            if (searchZipcode) params.append("zipcode", searchZipcode);
 
             router.push(`?${params.toString()}`);
-            fetchBusinesses(Object.fromEntries(params.entries())); // Trigger API call immediately
+            fetchBusinesses(Object.fromEntries(params.entries()));
           }}
           style={{
             padding: '10px 15px',
@@ -174,8 +197,60 @@ const LocalBusinessesPage = () => {
           <option value="Home Services">Home Services</option>
           <option value="Other">Other</option>
         </select>
-      </form>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <input
+            type="text"
+            placeholder="Zipcode"
+            value={searchZipcode}
+            onChange={(e) => {
+              setSearchZipcode(e.target.value);
+              const params = new URLSearchParams();
+              if (searchTerm) params.append("term", searchTerm);
+              if (filterCategory) params.append("category", filterCategory);
+              if (searchRadius) params.append("radius", searchRadius);
+              if (e.target.value) params.append("zipcode", e.target.value);
 
+              router.push(`?${params.toString()}`);
+              fetchBusinesses(Object.fromEntries(params.entries()));
+            }}
+            style={{
+              width: '120px',
+              padding: '10px 15px',
+              borderRadius: '25px',
+              border: '2px solid #28a745',
+              fontSize: '16px',
+              backgroundColor: '#ffffff',
+              outline: 'none',
+            }}
+          />
+          <input
+            type="number"
+            placeholder="Radius (km)"
+            value={searchRadius}
+            onChange={(e) => {
+              setSearchRadius(e.target.value);
+              const params = new URLSearchParams();
+              if (searchTerm) params.append("term", searchTerm);
+              if (filterCategory) params.append("category", filterCategory);
+              if (e.target.value) params.append("radius", e.target.value);
+              if (searchZipcode) params.append("zipcode", searchZipcode);
+
+              router.push(`?${params.toString()}`);
+              fetchBusinesses(Object.fromEntries(params.entries()));
+            }}
+            min="1"
+            style={{
+              width: '120px',
+              padding: '10px 15px',
+              borderRadius: '25px',
+              border: '2px solid #28a745',
+              fontSize: '16px',
+              backgroundColor: '#ffffff',
+              outline: 'none',
+            }}
+          />
+        </div>
+      </form>
 
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
         {filterCategory && (
@@ -191,20 +266,20 @@ const LocalBusinessesPage = () => {
               fontWeight: '500',
               boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
               cursor: 'pointer',
-              transition: 'background-color 0.2s ease', 
+              transition: 'background-color 0.2s ease',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(4, 181, 78, 1)'; 
-              e.currentTarget.style.color = '#ffffff'; 
+              e.currentTarget.style.backgroundColor = 'rgba(4, 181, 78, 1)';
+              e.currentTarget.style.color = '#ffffff';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(4, 181, 78, 0.2)'; 
-              e.currentTarget.style.color = 'rgba(4, 181, 78, 1)'; 
+              e.currentTarget.style.backgroundColor = 'rgba(4, 181, 78, 0.2)';
+              e.currentTarget.style.color = 'rgba(4, 181, 78, 1)';
             }}
           >
             <span>{filterCategory}</span>
             <AiOutlineClose
-               onClick={(e) => {
+              onClick={(e) => {
                 e.stopPropagation();
                 clearCategoryFilter();
               }}
@@ -217,8 +292,47 @@ const LocalBusinessesPage = () => {
             />
           </div>
         )}
-      </div>
 
+        {(searchRadius && searchZipcode) && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: '5px 10px',
+              backgroundColor: 'rgba(40, 167, 69, 0.2)',
+              borderRadius: '20px',
+              fontSize: '14px',
+              color: '#28a745',
+              fontWeight: '500',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(40, 167, 69, 1)';
+              e.currentTarget.style.color = '#ffffff';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';
+              e.currentTarget.style.color = 'rgba(40, 167, 69, 1)';
+            }}
+          >
+            <span>{searchRadius} km around {searchZipcode}</span>
+            <AiOutlineClose
+              onClick={(e) => {
+                e.stopPropagation();
+                clearRadiusFilter();
+              }}
+              style={{
+                marginLeft: '5px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                color: 'inherit',
+              }}
+            />
+          </div>
+        )}
+      </div>
 
       <div
         style={{
@@ -229,7 +343,7 @@ const LocalBusinessesPage = () => {
         }}
       >
         {loading ? (
-          <Spinner color="success"/>
+          <Spinner color="success" />
         ) : businesses.length > 0 ? (
           businesses.map((business) => (
             <Card

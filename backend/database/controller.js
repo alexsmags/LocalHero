@@ -3,6 +3,7 @@ const Users = require("../../src/app/model/user");
 const Businesses = require("../../src/app/model/business");
 const Artisans = require("../../src/app/model/artisan");
 const mongoose = require("mongoose");
+const geocoder = require('../../utils/geocoder');
 
 
 //---------------------------------------------------------------------------------------------
@@ -96,6 +97,42 @@ async function getUser(req, res) {
 //---------------------------------------------------------------------------------------------
 //Business database here
 //---------------------------------------------------------------------------------------------
+
+async function getBusinessesInRadius(req, res) {
+  try {
+    const { zipcode, distance } = req.params;
+
+    // Get lat/lng from geocoder
+    const loc = await geocoder.geocode(zipcode);
+    if (!loc.length) {
+      return res.status(404).json({ error: "Invalid zipcode or location not found" });
+    }
+    const lat = loc[0].latitude;
+    const lng = loc[0].longitude;
+
+    // Calculate radius in radians (distance / Earth's radius in km)
+    const radius = distance / 6378;
+
+    // Find businesses within the radius
+    const business = await Businesses.find({
+      adress: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
+    });
+
+    if (!business.length) {
+      return res.status(404).json({ error: "No businesses found in the specified radius" });
+    }
+
+    res.status(200).json({
+      success: true,
+      count: business.length,
+      data: business,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
 
 
 //get the businesses 
@@ -219,14 +256,13 @@ async function deleteBusiness(req, res) {
   }
 }
 
-const getBusinessesFiltered = async (req, res) => {
+const getBusinessesFiltered = async (req, res, filters) => {
   try {
-    const filters = req.query; // Extract query parameters
     let query = {};
 
     // Text search across name, description, and category
     if (filters.term) {
-      const searchRegex = new RegExp(filters.term, "i"); // Case-insensitive regex
+      const searchRegex = new RegExp(filters.term, "i");
       query.$or = [
         { name: searchRegex },
         { description: searchRegex },
@@ -235,11 +271,66 @@ const getBusinessesFiltered = async (req, res) => {
     }
 
     // Exact match for category (optional filter)
-    if (filters.category) {
-      query.category = filters.category;
+    if (filters.categoryType) {
+      query.category = filters.categoryType;
     }
 
-    const businesses = await Businesses.find(query).sort({ createdAt: -1 }); // Sort by newest
+    // If both zipcode and radius are provided, use getBusinessesInRadius
+    if (filters.zipcode && filters.radius) {
+      try {
+        // Create a new request-like object to use getBusinessesInRadius
+        const radiusReq = {
+          params: {
+            zipcode: filters.zipcode,
+            distance: filters.radius
+          }
+        };
+
+        const radiusResult = await new Promise((resolve, reject) => {
+          getBusinessesInRadius(radiusReq, {
+            status: (code) => ({
+              json: (data) => {
+                if (code === 200) resolve(data.data);
+                else reject(new Error(data.error));
+              }
+            })
+          });
+        });
+
+        // If radius filtering is successful, filter further if needed
+        if (filters.term || filters.categoryType) {
+          // Apply additional text and category filters to radius-filtered results
+          return res.status(200).json(
+            radiusResult.filter(business => {
+              let matchesTerm = !filters.term;
+              let matchesCategory = !filters.categoryType;
+
+              if (filters.term) {
+                const searchRegex = new RegExp(filters.term, "i");
+                matchesTerm = searchRegex.test(business.name) || 
+                              searchRegex.test(business.description) || 
+                              searchRegex.test(business.category);
+              }
+
+              if (filters.categoryType) {
+                matchesCategory = business.category === filters.categoryType;
+              }
+
+              return matchesTerm && matchesCategory;
+            })
+          );
+        }
+
+        // If no additional filters, return radius-filtered results
+        return res.status(200).json(radiusResult);
+      } catch (radiusError) {
+        // If no businesses found in radius, return empty array
+        return res.status(200).json([]);
+      }
+    }
+
+    // If no radius filter, proceed with original filtering
+    const businesses = await Businesses.find(query).sort({ createdAt: -1 }); 
     res.status(200).json(businesses);
   } catch (error) {
     console.error("Error fetching businesses:", error);
@@ -248,11 +339,47 @@ const getBusinessesFiltered = async (req, res) => {
 };
 
 
-
-
 //---------------------------------------------------------------------------------------------
 //Artisan database here
 //---------------------------------------------------------------------------------------------
+
+
+async function getArtisansInRadius(req, res) {
+  try {
+    const { zipcode, distance } = req.params;
+
+    // Get lat/lng from geocoder
+    const loc = await geocoder.geocode(zipcode);
+    if (!loc.length) {
+      return res.status(404).json({ error: "Invalid zipcode or location not found" });
+    }
+    const lat = loc[0].latitude;
+    const lng = loc[0].longitude;
+
+    // Calculate radius in radians (distance / Earth's radius in km)
+    const radius = distance / 6378;
+
+    // Find businesses within the radius
+    const artisans = await Artisans.find({
+      adress: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
+    });
+
+    if (!artisans.length) {
+      return res.status(404).json({ error: "No artisans found in the specified radius" });
+    }
+
+    res.status(200).json({
+      success: true,
+      count: artisans.length,
+      data: artisans,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+
 
 
 //get the artisans 
@@ -381,20 +508,77 @@ const getArtisansFiltered = async (req, res) => {
     const filters = req.query; 
     let query = {};
 
+    // Text search across name, bio, and skills
     if (filters.term) {
-      const searchRegex = new RegExp(filters.term, "i"); 
+      const searchRegex = new RegExp(filters.term, "i");
       query.$or = [
         { name: searchRegex },
         { bio: searchRegex },
-        { skills: { $regex: searchRegex } }, 
+        { skills: { $regex: searchRegex } },
       ];
     }
 
+    // Exact match for skills (optional filter)
     if (filters.skill) {
-      query.skills = { $elemMatch: { $regex: new RegExp(filters.skill, "i") } }; 
+      query.skills = { $elemMatch: { $regex: new RegExp(filters.skill, "i") } };
     }
 
-    const artisans = await Artisans.find(query).sort({ createdAt: -1 }); 
+    // If both zipcode and radius are provided, use getArtisansInRadius
+    if (filters.zipcode && filters.radius) {
+      try {
+        // Create a new request-like object to use getArtisansInRadius
+        const radiusReq = {
+          params: {
+            zipcode: filters.zipcode,
+            distance: filters.radius
+          }
+        };
+
+        const radiusResult = await new Promise((resolve, reject) => {
+          getArtisansInRadius(radiusReq, {
+            status: (code) => ({
+              json: (data) => {
+                if (code === 200) resolve(data.data);
+                else reject(new Error(data.error));
+              }
+            })
+          });
+        });
+
+        // If radius filtering is successful, apply additional filters if needed
+        if (filters.term || filters.skill) {
+          return res.status(200).json(
+            radiusResult.filter(artisan => {
+              let matchesTerm = !filters.term;
+              let matchesSkill = !filters.skill;
+
+              if (filters.term) {
+                const searchRegex = new RegExp(filters.term, "i");
+                matchesTerm = searchRegex.test(artisan.name) || 
+                              searchRegex.test(artisan.bio) || 
+                              artisan.skills.some(skill => searchRegex.test(skill));
+              }
+
+              if (filters.skill) {
+                const skillRegex = new RegExp(filters.skill, "i");
+                matchesSkill = artisan.skills.some(skill => skillRegex.test(skill));
+              }
+
+              return matchesTerm && matchesSkill;
+            })
+          );
+        }
+
+        // If no additional filters, return radius-filtered results
+        return res.status(200).json(radiusResult);
+      } catch (radiusError) {
+        // If no artisans found in radius, return empty array
+        return res.status(200).json([]);
+      }
+    }
+
+    // If no radius filter, proceed with original filtering
+    const artisans = await Artisans.find(query).sort({ createdAt: -1 });
     res.status(200).json(artisans);
   } catch (error) {
     console.error("Error fetching artisans:", error);
@@ -426,5 +610,7 @@ const getArtisansFiltered = async (req, res) => {
     addArtisan: addArtisan,
     putArtisan: putArtisan,
     deleteArtisan: deleteArtisan,
-    getArtisansFiltered: getArtisansFiltered
+    getArtisansFiltered: getArtisansFiltered,
+    getBusinessesInRadius:getBusinessesInRadius,
+    getArtisansInRadius:getArtisansInRadius
   };

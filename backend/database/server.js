@@ -21,8 +21,9 @@ const {
   addArtisan,
   putArtisan,
   deleteArtisan,
-  getArtisansFiltered
-} = require("./controller.js");
+  getBusinessesInRadius,
+  getArtisansInRadius,
+  getArtisansFiltered} = require("./controller.js");
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -71,6 +72,12 @@ app.prepare().then(() => {
   //---------------------------------------------------------------
   //For businesses
   //---------------------------------------------------------------
+  
+  server.get("/api/businessradius/:zipcode/:distance", (req, res) => {
+    getBusinessesInRadius(req, res);
+  });
+
+  
   server.get("/api/business", (req, res) => {
     getBusinesses(req, res);
   });
@@ -96,19 +103,25 @@ app.prepare().then(() => {
   });
 
   server.get("/api/businessfilter", (req, res) => {
-    const { term, categoryType } = req.query;
-
+    const { term, categoryType, zipcode, radius } = req.query;
+  
     getBusinessesFiltered(req, res, {
       term,
-      categoryType
+      categoryType,
+      zipcode,
+      radius
     });
   });
-
 
   
   //---------------------------------------------------------------
   //For artisans
   //---------------------------------------------------------------
+  server.get("/api/artisansradius/:zipcode/:distance", (req, res) => {
+    getArtisansInRadius(req, res);
+  });
+
+  
   server.get("/api/artisan", (req, res) => {
     getArtisans(req, res);
   });
@@ -134,11 +147,13 @@ app.prepare().then(() => {
   });
 
   server.get("/api/artisanfilter", (req, res) => {
-    const { term, categoryType } = req.query;
+    const { term, categoryType, zipcode, radius } = req.query;
 
     getArtisansFiltered(req, res, {
       term,
-      categoryType
+      categoryType,
+      zipcode,
+      radius
     });
   });
 

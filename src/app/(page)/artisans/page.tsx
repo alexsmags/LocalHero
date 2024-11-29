@@ -4,7 +4,7 @@ import { Card, Button } from '@nextui-org/react';
 import { AiOutlineClose, AiOutlineSearch } from "react-icons/ai";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getArtisanssFiltered } from "../../../../backend/lib/HelperArtisan";
-import {Spinner} from "@nextui-org/react";
+import { Spinner } from "@nextui-org/react";
 
 interface Artisan {
   _id: string;
@@ -28,8 +28,10 @@ const LocalArtisansPage = () => {
   const [artisans, setArtisans] = useState<Artisan[]>([]);
   const [searchTerm, setSearchTerm] = useState(searchParams.get("term") || "");
   const [filterSkill, setFilterSkill] = useState(searchParams.get("skill") || "");
+  const [searchRadius, setSearchRadius] = useState(searchParams.get("radius") || "");
+  const [searchZipcode, setSearchZipcode] = useState(searchParams.get("zipcode") || "");
   const [loading, setLoading] = useState(true);
-  const [focused, setFocused] = useState(false); // State to track input focus
+  const [focused, setFocused] = useState(false);
 
   const fetchArtisans = async (filters: Record<string, string>) => {
     setLoading(true);
@@ -47,6 +49,8 @@ const LocalArtisansPage = () => {
     const params = new URLSearchParams();
     if (searchTerm) params.append("term", searchTerm);
     if (filterSkill) params.append("skill", filterSkill);
+    if (searchRadius) params.append("radius", searchRadius);
+    if (searchZipcode) params.append("zipcode", searchZipcode);
 
     router.push(`?${params.toString()}`);
     fetchArtisans(Object.fromEntries(params.entries()));
@@ -60,6 +64,19 @@ const LocalArtisansPage = () => {
     setFilterSkill("");
     const params = new URLSearchParams();
     if (searchTerm) params.append("term", searchTerm);
+    if (searchRadius) params.append("radius", searchRadius);
+    if (searchZipcode) params.append("zipcode", searchZipcode);
+
+    router.push(`?${params.toString()}`);
+    fetchArtisans(Object.fromEntries(params.entries()));
+  };
+
+  const clearRadiusFilter = () => {
+    setSearchRadius("");
+    setSearchZipcode("");
+    const params = new URLSearchParams();
+    if (searchTerm) params.append("term", searchTerm);
+    if (filterSkill) params.append("skill", filterSkill);
 
     router.push(`?${params.toString()}`);
     fetchArtisans(Object.fromEntries(params.entries()));
@@ -69,6 +86,8 @@ const LocalArtisansPage = () => {
     const filters: Record<string, string> = {};
     if (searchParams.get("term")) filters.term = searchParams.get("term")!;
     if (searchParams.get("skill")) filters.skill = searchParams.get("skill")!;
+    if (searchParams.get("radius")) filters.radius = searchParams.get("radius")!;
+    if (searchParams.get("zipcode")) filters.zipcode = searchParams.get("zipcode")!;
 
     fetchArtisans(filters);
   }, [searchParams]);
@@ -82,6 +101,7 @@ const LocalArtisansPage = () => {
         }}
         style={{
           display: 'flex',
+          flexWrap: 'wrap',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '15px',
@@ -91,6 +111,7 @@ const LocalArtisansPage = () => {
           marginBottom: '20px',
           boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
           position: 'relative',
+          gap: '10px'
         }}
       >
         <span style={{ fontSize: '16px', fontWeight: 'bold', marginRight: '20px' }}>
@@ -152,9 +173,11 @@ const LocalArtisansPage = () => {
             const params = new URLSearchParams();
             if (searchTerm) params.append("term", searchTerm);
             if (e.target.value) params.append("skill", e.target.value);
+            if (searchRadius) params.append("radius", searchRadius);
+            if (searchZipcode) params.append("zipcode", searchZipcode);
 
             router.push(`?${params.toString()}`);
-            fetchArtisans(Object.fromEntries(params.entries())); // Trigger API call immediately
+            fetchArtisans(Object.fromEntries(params.entries()));
           }}
           style={{
             padding: '10px 15px',
@@ -206,6 +229,59 @@ const LocalArtisansPage = () => {
           <option value="Sign Painting">Sign Painting</option>
           <option value="Other">Other</option>
         </select>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <input
+            type="text"
+            placeholder="Zipcode"
+            value={searchZipcode}
+            onChange={(e) => {
+              setSearchZipcode(e.target.value);
+              const params = new URLSearchParams();
+              if (searchTerm) params.append("term", searchTerm);
+              if (filterSkill) params.append("skill", filterSkill);
+              if (searchRadius) params.append("radius", searchRadius);
+              if (e.target.value) params.append("zipcode", e.target.value);
+
+              router.push(`?${params.toString()}`);
+              fetchArtisans(Object.fromEntries(params.entries()));
+            }}
+            style={{
+              width: '120px',
+              padding: '10px 15px',
+              borderRadius: '25px',
+              border: '2px solid #28a745',
+              fontSize: '16px',
+              backgroundColor: '#ffffff',
+              outline: 'none',
+            }}
+          />
+          <input
+            type="number"
+            placeholder="Radius (km)"
+            value={searchRadius}
+            onChange={(e) => {
+              setSearchRadius(e.target.value);
+              const params = new URLSearchParams();
+              if (searchTerm) params.append("term", searchTerm);
+              if (filterSkill) params.append("skill", filterSkill);
+              if (e.target.value) params.append("radius", e.target.value);
+              if (searchZipcode) params.append("zipcode", searchZipcode);
+
+              router.push(`?${params.toString()}`);
+              fetchArtisans(Object.fromEntries(params.entries()));
+            }}
+            min="1"
+            style={{
+              width: '120px',
+              padding: '10px 15px',
+              borderRadius: '25px',
+              border: '2px solid #28a745',
+              fontSize: '16px',
+              backgroundColor: '#ffffff',
+              outline: 'none',
+            }}
+          />
+        </div>
       </form>
 
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
@@ -248,6 +324,46 @@ const LocalArtisansPage = () => {
             />
           </div>
         )}
+
+        {(searchRadius && searchZipcode) && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: '5px 10px',
+              backgroundColor: 'rgba(40, 167, 69, 0.2)',
+              borderRadius: '20px',
+              fontSize: '14px',
+              color: '#28a745',
+              fontWeight: '500',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(40, 167, 69, 1)';
+              e.currentTarget.style.color = '#ffffff';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';
+              e.currentTarget.style.color = 'rgba(40, 167, 69, 1)';
+            }}
+          >
+            <span>{searchRadius} km around {searchZipcode}</span>
+            <AiOutlineClose
+              onClick={(e) => {
+                e.stopPropagation();
+                clearRadiusFilter();
+              }}
+              style={{
+                marginLeft: '5px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                color: 'inherit',
+              }}
+            />
+          </div>
+        )}
       </div>
 
       <div
@@ -259,7 +375,7 @@ const LocalArtisansPage = () => {
         }}
       >
         {loading ? (
-          <Spinner color="success"/>
+          <Spinner color="success" />
         ) : artisans.length > 0 ? (
           artisans.map((artisan) => (
             <Card

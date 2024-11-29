@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const geocoder = require('../../../utils/geocoder');
 
 const businessSchema = new mongoose.Schema(
   {
@@ -8,7 +9,7 @@ const businessSchema = new mongoose.Schema(
       trim: true,
     },
     category: {
-      type: String, 
+      type: String,
       required: true,
     },
     description: {
@@ -33,9 +34,27 @@ const businessSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+
     location: {
       type: String,
-      required: true,
+      required: [true, 'Please add an address'],
+    },
+    adress: {
+      // GeoJSON Point
+      type: {
+        type: String,
+        enum: ['Point'],
+      },
+      coordinates: {
+        type: [Number],
+        index: '2dsphere',
+      },
+      formattedAddress: String,
+      street: String,
+      city: String,
+      state: String,
+      zipcode: String,
+      country: String,
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
@@ -55,6 +74,31 @@ const businessSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Geocode & create location field
+businessSchema.pre('save', async function (next) {
+  const loc = await geocoder.geocode(this.location);
+
+  if (loc.length > 0) {
+    this.adress = {
+      type: 'Point',
+      coordinates: [loc[0].longitude, loc[0].latitude],
+      formattedAddress: loc[0].formattedAddress,
+      street: loc[0].streetName,
+      city: loc[0].city,
+      state: loc[0].stateCode,
+      zipcode: loc[0].zipcode,
+      country: loc[0].countryCode,
+    };
+
+    // Overwrite the initial location with the formatted address
+    this.location = loc[0].formattedAddress;
+  } else {
+    throw new Error('Geocoding failed. Please provide a valid address.');
+  }
+
+  next();
+});
 
 businessSchema.index({ name: 'text', description: 'text', category: 'text' });
 
