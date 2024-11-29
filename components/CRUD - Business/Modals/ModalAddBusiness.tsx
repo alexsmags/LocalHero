@@ -134,7 +134,7 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
       }}
     >
       <ModalContent>
-        <ModalHeader style={{ fontFamily: "PPGoshaBold, sans-serif", color: "#04b54e" }}>
+        <ModalHeader style={{ fontFamily: "Poppins, sans-serif", color: "#04b54e" }}>
           Add New Business
         </ModalHeader>
         <ModalBody>
@@ -145,7 +145,7 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               borderColor: formErrors.name ? "red" : undefined,
             }}
             value={formData.name}
@@ -162,7 +162,7 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               borderColor: formErrors.category ? "red" : undefined,
             }}
             onChange={(selectedValue) => {
@@ -177,7 +177,7 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
               <SelectItem
                 key={cat._id}
                 value={cat.name}
-                style={{ fontFamily: "PPGoshaBold, sans-serif", padding: "5px 10px" }}
+                style={{ fontFamily: "Poppins, sans-serif", padding: "5px 10px" }}
               >
                 {cat.name}
               </SelectItem>
@@ -193,7 +193,7 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               borderColor: formErrors.description ? "red" : undefined,
             }}
             value={formData.description}
@@ -210,7 +210,7 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
             }}
             value={formData.imageUrl}
             onChange={(e) =>
@@ -226,7 +226,7 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               borderColor: formErrors.website ? "red" : undefined,
             }}
             value={formData.website}
@@ -244,7 +244,7 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               borderColor: formErrors.contactEmail ? "red" : undefined,
             }}
             value={formData.contactEmail}
@@ -262,7 +262,7 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               borderColor: formErrors.phone ? "red" : undefined,
             }}
             value={formData.phone}
@@ -279,7 +279,7 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               borderColor: formErrors.location ? "red" : undefined,
             }}
             value={formData.location}
@@ -295,7 +295,7 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
               backgroundColor: "#FFFFFF",
               color: "#04b54e",
               border: "1px solid #04b54e",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               width: "120px",
             }}
             onClick={handleModalClose}
@@ -306,7 +306,7 @@ export default function AddBusinessModal({ isOpen, onClose, categories, onSucces
             style={{
               backgroundColor: "#04b54e",
               color: "#FFFFFF",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               width: "120px",
             }}
             onClick={handleSubmit}

@@ -56,7 +56,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </div>
           <h2
             style={{
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               color: "#333",
               margin: 0,
             }}
@@ -70,7 +70,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           <p
             style={{
               textAlign: "center",
-              fontFamily: "Arial, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               fontSize: "14px",
               color: "#555",
               margin: 0,
@@ -91,7 +91,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             style={{
               backgroundColor: "#E9ECEF",
               color: "#6C757D",
-              fontFamily: "Arial, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               border: "none",
               width: "100px",
             }}
@@ -103,7 +103,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             style={{
               backgroundColor: "#DC3545",
               color: "#FFFFFF",
-              fontFamily: "Arial, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               border: "none",
               width: "100px",
             }}

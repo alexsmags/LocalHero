@@ -24,7 +24,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} style={{ borderRadius: "12px" }}>
       <ModalContent>
-        {/* Header */}
         <ModalHeader
           style={{
             display: "flex",
@@ -56,7 +55,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </div>
           <h2
             style={{
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               color: "#333",
               margin: 0,
             }}
@@ -65,7 +64,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </h2>
         </ModalHeader>
 
-        {/* Body */}
         <ModalBody>
           <p
             style={{
@@ -80,7 +78,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </p>
         </ModalBody>
 
-        {/* Footer */}
         <ModalFooter
           style={{
             justifyContent: "center",

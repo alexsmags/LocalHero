@@ -65,7 +65,7 @@ export default function LocationFilterModal({
       <ModalContent>
         <ModalHeader
           style={{
-            fontFamily: "PPGoshaBold, sans-serif",
+            fontFamily: "Poppins, sans-serif",
             color: "#04b54e",
           }}
         >
@@ -81,7 +81,7 @@ export default function LocationFilterModal({
             onChange={(e) => setZipcode(e.target.value)}
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               borderColor: formErrors.zipcode ? "red" : undefined,
             }}
           />
@@ -96,13 +96,13 @@ export default function LocationFilterModal({
               style={{
                 marginBottom: "10px",
                 fontWeight: "bold",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             >
               Radius (km)
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <span style={{ color: "#888", fontFamily: "PPGoshaBold, sans-serif" }}>
+              <span style={{ color: "#888", fontFamily: "Poppins, sans-serif" }}>
                 1 km
               </span>
               <input
@@ -121,7 +121,7 @@ export default function LocationFilterModal({
               <span
                 style={{
                   color: "#888",
-                  fontFamily: "PPGoshaBold, sans-serif",
+                  fontFamily: "Poppins, sans-serif",
                 }}
               >
                 {radius} km
@@ -135,7 +135,7 @@ export default function LocationFilterModal({
               backgroundColor: "#FFFFFF",
               color: "#04b54e",
               border: "1px solid #04b54e",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               width: "120px",
             }}
             onClick={onClose}
@@ -147,7 +147,7 @@ export default function LocationFilterModal({
             style={{
               backgroundColor: "#04b54e",
               color: "#FFFFFF",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               width: "120px",
             }}
             onClick={handleApplyFilters}

@@ -47,13 +47,13 @@ const EditArtisanModal = ({
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
-  // Populate form data when modal opens or `artisan` changes
+
   useEffect(() => {
     if (artisan) {
       setFormData({ target: { name: "name", value: artisan.name || "" } });
       setFormData({
         target: { name: "skills", value: artisan.skills?.join(", ") || "" },
-      }); // Convert array to comma-separated string
+      }); 
       setFormData({
         target: { name: "bio", value: artisan.bio || "" },
       });
@@ -75,11 +75,11 @@ const EditArtisanModal = ({
           name: "socialMedia",
           value: artisan.socialMedia?.join(", ") || "",
         },
-      }); // Convert array to comma-separated string
+      }); 
     }
   }, [artisan]);
 
-  // Detect changes between form data and original artisan data
+
   useEffect(() => {
     if (artisan) {
       const originalData = {
@@ -102,10 +102,10 @@ const EditArtisanModal = ({
     try {
       const updatedArtisan = {
         ...formData,
-        skills: formData.skills.split(",").map((skill: string) => skill.trim()), // Convert string to array
+        skills: formData.skills.split(",").map((skill: string) => skill.trim()), 
         socialMedia: formData.socialMedia
           .split(",")
-          .map((link: string) => link.trim()), // Convert string to array
+          .map((link: string) => link.trim()), 
       };
 
       console.log("Saving Data:", updatedArtisan);
@@ -123,7 +123,7 @@ const EditArtisanModal = ({
     if (hasChanges) {
       setIsConfirmationOpen(true);
     } else {
-      handleSave(); // Save directly if no changes were made
+      handleSave(); 
     }
   };
 
@@ -139,7 +139,7 @@ const EditArtisanModal = ({
         <ModalContent>
           <ModalHeader
             style={{
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               color: "#04b54e",
             }}
           >
@@ -147,7 +147,7 @@ const EditArtisanModal = ({
           </ModalHeader>
           <ModalBody
               style={{
-                maxHeight: "700px", // Limit modal body height
+                maxHeight: "700px", 
                 overflowY: "auto",
               }}>
             <Input
@@ -159,7 +159,7 @@ const EditArtisanModal = ({
               onChange={(e) => setFormData(e)}
               style={{
                 backgroundColor: "#f9f9f9",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             />
             <SkillsInput
@@ -177,7 +177,7 @@ const EditArtisanModal = ({
               onChange={(e) => setFormData(e)}
               style={{
                 backgroundColor: "#f9f9f9",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             />
             <Input
@@ -189,7 +189,7 @@ const EditArtisanModal = ({
               onChange={(e) => setFormData(e)}
               style={{
                 backgroundColor: "#f9f9f9",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             />
             <Input
@@ -201,7 +201,7 @@ const EditArtisanModal = ({
               onChange={(e) => setFormData(e)}
               style={{
                 backgroundColor: "#f9f9f9",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             />
             <Input
@@ -214,7 +214,7 @@ const EditArtisanModal = ({
               onChange={(e) => setFormData(e)}
               style={{
                 backgroundColor: "#f9f9f9",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             />
             <Input
@@ -227,7 +227,7 @@ const EditArtisanModal = ({
               onChange={(e) => setFormData(e)}
               style={{
                 backgroundColor: "#f9f9f9",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             />
             <Input
@@ -239,7 +239,7 @@ const EditArtisanModal = ({
               onChange={(e) => setFormData(e)}
               style={{
                 backgroundColor: "#f9f9f9",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             />
             <Textarea
@@ -251,7 +251,7 @@ const EditArtisanModal = ({
               onChange={(e) => setFormData(e)}
               style={{
                 backgroundColor: "#f9f9f9",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             />
           </ModalBody>
@@ -266,7 +266,7 @@ const EditArtisanModal = ({
                 backgroundColor: "#FFFFFF",
                 color: "#04b54e",
                 border: "1px solid #04b54e",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
                 width: "120px",
               }}
               onClick={onClose}
@@ -275,13 +275,13 @@ const EditArtisanModal = ({
             </Button>
             <Button
               style={{
-                backgroundColor: hasChanges ? "#04b54e" : "#d3d3d3", // Gray when disabled
+                backgroundColor: hasChanges ? "#04b54e" : "#d3d3d3",
                 color: "#FFFFFF",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
                 width: "120px",
               }}
               onClick={handleSaveClick}
-              disabled={!hasChanges} // Disable button if no changes
+              disabled={!hasChanges} 
             >
               Save Changes
             </Button>
@@ -289,7 +289,6 @@ const EditArtisanModal = ({
         </ModalContent>
       </Modal>
 
-      {/* Confirmation Modal */}
       <SaveChangesModal
         isOpen={isConfirmationOpen}
         onClose={() => setIsConfirmationOpen(false)}

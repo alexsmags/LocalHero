@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 interface SkillsInputProps {
-  initialSkills?: string[]; // Pre-selected skills for editing
+  initialSkills?: string[]; 
   onChange: (skills: string[]) => void;
 }
 
@@ -53,13 +53,13 @@ const SkillsInput: React.FC<SkillsInputProps> = ({ initialSkills = [], onChange 
   const [customSkill, setCustomSkill] = useState("");
 
   useEffect(() => {
-    setSelectedSkills(initialSkills); // Update selected skills when `initialSkills` changes
+    setSelectedSkills(initialSkills); 
   }, []);
 
   const toggleSkill = (skill: string) => {
     const updatedSkills = selectedSkills.includes(skill)
-      ? selectedSkills.filter((s) => s !== skill) // Remove skill
-      : [...selectedSkills, skill]; // Add skill
+      ? selectedSkills.filter((s) => s !== skill) 
+      : [...selectedSkills, skill]; 
     setSelectedSkills(updatedSkills);
     onChange(updatedSkills);
   };

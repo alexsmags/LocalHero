@@ -1,12 +1,65 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@font-face {
-  font-family: PPGoshaReg;
-  src: url("/fonts/PPGoshaSans-Regular.otf") format("opentype");
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-@font-face {
-  font-family: PPGoshaBold;
-  src: url("/fonts/PPGoshaSans-Bold.otf") format("opentype");
+
+.slick-prev::before,
+.slick-next::before {
+  content: ''; 
+  display: none; 
+}
+
+.slick-prev,
+.slick-next {
+  font-size: 0; 
+  line-height: 0;
+  border: none;
+  background-color: #04b54e; 
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  position: absolute;
+  z-index: 2;
+  transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white; 
+}
+
+.slick-prev:hover,
+.slick-next:hover {
+  transform: scale(1.1); 
+}
+
+
+.slick-prev::after,
+.slick-next::after {
+  content: ''; 
+  border: solid #04b54e; 
+  border-width: 0 3px 3px 0; 
+  display: inline-block;
+  padding: 6px; 
+}
+
+.slick-prev::after {
+  transform: rotate(135deg); 
+}
+
+.slick-next::after {
+  transform: rotate(-45deg); 
+}
+
+.slick-prev {
+  left: -40px; 
+}
+
+.slick-next {
+  right: -40px; 
 }

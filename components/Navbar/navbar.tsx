@@ -25,7 +25,6 @@ export default function App() {
 
   return (
     <Navbar isBordered style={{ backgroundColor: "#04b54e" }}>
-      {/* Navbar Start - Logo */}
       <NavbarContent justify="start" className="flex-shrink-0">
         <NavbarBrand className="mr-4">
           <Link href="/">
@@ -41,31 +40,70 @@ export default function App() {
         </NavbarBrand>
       </NavbarContent>
 
-      {/* Navbar Center - Links */}
       <NavbarContent className="hidden md:flex gap-3 flex-grow justify-center">
         <NavbarItem>
-          <Link style={{ fontFamily: "PPGoshaBold, sans-serif", color: "#FFFFFF" }} href="/">
+          <Link
+            style={{
+              fontFamily: "Poppins, sans-serif",
+              color: "#FFFFFF",
+              fontSize: "18px", 
+              fontWeight: "600", 
+            }}
+            href="/"
+          >
             Home
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link style={{ fontFamily: "PPGoshaBold, sans-serif", color: "#FFFFFF" }} href="/businesses">
+          <Link
+            style={{
+              fontFamily: "Poppins, sans-serif",
+              color: "#FFFFFF",
+              fontSize: "18px",
+              fontWeight: "600",
+            }}
+            href="/businesses"
+          >
             Businesses
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link style={{ fontFamily: "PPGoshaBold, sans-serif", color: "#FFFFFF" }} href="/artisans">
+          <Link
+            style={{
+              fontFamily: "Poppins, sans-serif",
+              color: "#FFFFFF",
+              fontSize: "18px",
+              fontWeight: "600",
+            }}
+            href="/artisans"
+          >
             Artisans
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link style={{ fontFamily: "PPGoshaBold, sans-serif", color: "#FFFFFF" }} href="/discover">
-            Discover
+          <Link
+            style={{
+              fontFamily: "Poppins, sans-serif",
+              color: "#FFFFFF",
+              fontSize: "18px",
+              fontWeight: "600",
+            }}
+            href="/resources"
+          >
+            Resources
           </Link>
         </NavbarItem>
         {session?.user?.role === "businessowner" ? (
           <NavbarItem>
-            <Link style={{ fontFamily: "PPGoshaBold, sans-serif", color: "#FF0000" }} href="/business_tool">
+            <Link
+              style={{
+                fontFamily: "Poppins, sans-serif",
+                color: "#FFFFFF",
+                fontSize: "18px",
+                fontWeight: "600",
+              }}
+              href="/business_tool"
+            >
               Business Management
             </Link>
           </NavbarItem>
@@ -73,12 +111,21 @@ export default function App() {
 
         {session?.user?.role === "artisan" ? (
           <NavbarItem>
-            <Link style={{ fontFamily: "PPGoshaBold, sans-serif", color: "#FF0000" }} href="/artisan_tool">
+            <Link
+              style={{
+                fontFamily: "Poppins, sans-serif",
+                color: "#FFFFFF",
+                fontSize: "18px",
+                fontWeight: "600",
+              }}
+              href="/artisan_tool"
+            >
               Artisan Management
             </Link>
           </NavbarItem>
         ) : null}
       </NavbarContent>
+
 
       {/* Navbar End - Avatar/Log In/Sign Up */}
       <NavbarContent className="items-center flex-shrink-0" justify="end">
@@ -103,20 +150,56 @@ export default function App() {
             >
               <DropdownItem
                 key="profile"
-                className="h-20 flex flex-col items-start gap-1 px-4 py-2 border-b border-gray-200"
+                className="h-24 flex flex-col items-start gap-1 px-4 py-2 border-b border-gray-200"
               >
-                <p className="font-semibold text-sm text-gray-600">
-                  Signed in as{" "}
-                  <span className="text-gray-900">
+                <p
+                  style={{
+                    fontFamily: "Poppins, sans-serif", 
+                    fontWeight: "600", 
+                    fontSize: "14px",
+                  }}
+                >
+                  Hi, {" "}
+                  <span
+                    style={{
+                      fontFamily: "Poppins, sans-serif", 
+                      fontWeight: "700", 
+                      fontSize: "14px", 
+                      color: "#111827", 
+                    }}
+                  >
                     {session.user.name || "Guest"}
                   </span>
                 </p>
-                <p className="text-xs text-gray-500">
+                <p
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontSize: "12px", 
+                    color: "#6B7280", 
+                  }}
+                >
                   {`Role: ${session.user.role}`}
                 </p>
-                <p className="text-xs text-gray-500">{`Email: ${session.user.email}`}</p>
-                <p className="text-xs text-gray-500">{`Location: ${session.user.location}`}</p>
+                <p
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontSize: "12px",
+                    color: "#6B7280",
+                  }}
+                >
+                  {`Email: ${session.user.email}`}
+                </p>
+                <p
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontSize: "12px",
+                    color: "#6B7280",
+                  }}
+                >
+                  {`Location: ${session.user.location}`}
+                </p>
               </DropdownItem>
+
 
               <DropdownItem
                 key="settings"

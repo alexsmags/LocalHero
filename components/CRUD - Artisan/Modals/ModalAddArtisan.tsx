@@ -132,7 +132,7 @@ export default function AddArtisanModal({ isOpen, onClose, onSuccessMessage }: a
       <ModalContent>
         <ModalHeader
           style={{
-            fontFamily: "PPGoshaBold, sans-serif",
+            fontFamily: "Poppins, sans-serif",
             color: "#04b54e",
           }}
         >
@@ -153,7 +153,7 @@ export default function AddArtisanModal({ isOpen, onClose, onSuccessMessage }: a
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               borderColor: formErrors.name ? "red" : undefined,
             }}
             value={formData.name}
@@ -175,7 +175,7 @@ export default function AddArtisanModal({ isOpen, onClose, onSuccessMessage }: a
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               borderColor: formErrors.bio ? "red" : undefined,
             }}
             value={formData.bio}
@@ -192,7 +192,7 @@ export default function AddArtisanModal({ isOpen, onClose, onSuccessMessage }: a
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
             }}
             value={formData.imageUrl}
             onChange={(e) =>
@@ -208,7 +208,7 @@ export default function AddArtisanModal({ isOpen, onClose, onSuccessMessage }: a
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               borderColor: formErrors.website ? "red" : undefined,
             }}
             value={formData.website}
@@ -226,7 +226,7 @@ export default function AddArtisanModal({ isOpen, onClose, onSuccessMessage }: a
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               borderColor: formErrors.contactEmail ? "red" : undefined,
             }}
             value={formData.contactEmail}
@@ -244,7 +244,7 @@ export default function AddArtisanModal({ isOpen, onClose, onSuccessMessage }: a
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               borderColor: formErrors.phone ? "red" : undefined,
             }}
             value={formData.phone}
@@ -261,7 +261,7 @@ export default function AddArtisanModal({ isOpen, onClose, onSuccessMessage }: a
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               borderColor: formErrors.location ? "red" : undefined,
             }}
             value={formData.location}
@@ -278,7 +278,7 @@ export default function AddArtisanModal({ isOpen, onClose, onSuccessMessage }: a
             fullWidth
             style={{
               backgroundColor: "#f9f9f9",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
             }}
             value={formData.socialMedia}
             onChange={(e) =>
@@ -293,7 +293,7 @@ export default function AddArtisanModal({ isOpen, onClose, onSuccessMessage }: a
               backgroundColor: "#FFFFFF",
               color: "#04b54e",
               border: "1px solid #04b54e",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               width: "120px",
             }}
             onClick={handleModalClose}
@@ -304,7 +304,7 @@ export default function AddArtisanModal({ isOpen, onClose, onSuccessMessage }: a
             style={{
               backgroundColor: "#04b54e",
               color: "#FFFFFF",
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               width: "120px",
             }}
             onClick={handleSubmit}

@@ -11,7 +11,7 @@ import {
   SelectItem,
   Textarea,
 } from "@nextui-org/react";
-import SaveChangesModal from "./SaveChangesModal"; // Import the SaveChangesModal
+import SaveChangesModal from "./SaveChangesModal"; 
 import { updateBusiness } from "../../../backend/lib/HelperBusiness";
 
 const formReducer = (state: any, event: any) => {
@@ -54,7 +54,7 @@ const EditBusinessModal = ({
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
-  // Populate form data when modal opens or `business` changes
+
   useEffect(() => {
     if (business) {
       const matchedCategory = categories.find(
@@ -83,7 +83,7 @@ const EditBusinessModal = ({
     }
   }, [business, categories]);
 
-  // Detect changes between form data and original business data
+
   useEffect(() => {
     if (business) {
       const matchedCategory = categories.find(
@@ -112,7 +112,7 @@ const EditBusinessModal = ({
 
       const updatedBusiness = {
         ...formData,
-        category: categoryName, // Use category name instead of _id
+        category: categoryName, 
       };
 
       console.log("Saving Data:", updatedBusiness);
@@ -130,7 +130,7 @@ const EditBusinessModal = ({
     if (hasChanges) {
       setIsConfirmationOpen(true);
     } else {
-      handleSave(); // Save directly if no changes were made
+      handleSave(); 
     }
   };
 
@@ -146,7 +146,7 @@ const EditBusinessModal = ({
         <ModalContent>
           <ModalHeader
             style={{
-              fontFamily: "PPGoshaBold, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               color: "#04b54e",
             }}
           >
@@ -162,7 +162,7 @@ const EditBusinessModal = ({
               onChange={(e) => setFormData(e)}
               style={{
                 backgroundColor: "#f9f9f9",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             />
             <Select
@@ -177,7 +177,7 @@ const EditBusinessModal = ({
               }}
               style={{
                 backgroundColor: "#f9f9f9",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             >
               {categories.map((cat) => (
@@ -185,7 +185,7 @@ const EditBusinessModal = ({
                   key={cat._id}
                   value={cat._id}
                   style={{
-                    fontFamily: "PPGoshaBold, sans-serif",
+                    fontFamily: "Poppins, sans-serif",
                     padding: "5px 10px",
                   }}
                 >
@@ -202,7 +202,7 @@ const EditBusinessModal = ({
               onChange={(e) => setFormData(e)}
               style={{
                 backgroundColor: "#f9f9f9",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             />
             <Input
@@ -214,7 +214,7 @@ const EditBusinessModal = ({
               onChange={(e) => setFormData(e)}
               style={{
                 backgroundColor: "#f9f9f9",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             />
             <Input
@@ -226,7 +226,7 @@ const EditBusinessModal = ({
               onChange={(e) => setFormData(e)}
               style={{
                 backgroundColor: "#f9f9f9",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             />
             <Input
@@ -239,7 +239,7 @@ const EditBusinessModal = ({
               onChange={(e) => setFormData(e)}
               style={{
                 backgroundColor: "#f9f9f9",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             />
             <Input
@@ -252,7 +252,7 @@ const EditBusinessModal = ({
               onChange={(e) => setFormData(e)}
               style={{
                 backgroundColor: "#f9f9f9",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             />
             <Input
@@ -264,7 +264,7 @@ const EditBusinessModal = ({
               onChange={(e) => setFormData(e)}
               style={{
                 backgroundColor: "#f9f9f9",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             />
           </ModalBody>
@@ -279,7 +279,7 @@ const EditBusinessModal = ({
                 backgroundColor: "#FFFFFF",
                 color: "#04b54e",
                 border: "1px solid #04b54e",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
                 width: "120px",
               }}
               onClick={onClose}
@@ -288,13 +288,13 @@ const EditBusinessModal = ({
             </Button>
             <Button
               style={{
-                backgroundColor: hasChanges ? "#04b54e" : "#d3d3d3", // Gray when disabled
+                backgroundColor: hasChanges ? "#04b54e" : "#d3d3d3", 
                 color: "#FFFFFF",
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
                 width: "120px",
               }}
               onClick={handleSaveClick}
-              disabled={!hasChanges} // Disable button if no changes
+              disabled={!hasChanges} 
             >
               Save Changes
             </Button>
@@ -302,7 +302,6 @@ const EditBusinessModal = ({
         </ModalContent>
       </Modal>
 
-      {/* Confirmation Modal */}
       <SaveChangesModal
         isOpen={isConfirmationOpen}
         onClose={() => setIsConfirmationOpen(false)}
