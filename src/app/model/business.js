@@ -100,6 +100,37 @@ businessSchema.pre('save', async function (next) {
   next();
 });
 
+businessSchema.pre('findOneAndUpdate', async function (next) {
+  const update = this.getUpdate();
+
+  if (update.location) {
+    const loc = await geocoder.geocode(update.location);
+
+    if (loc.length > 0) {
+      update.adress = {
+        type: 'Point',
+        coordinates: [loc[0].longitude, loc[0].latitude],
+        formattedAddress: loc[0].formattedAddress,
+        street: loc[0].streetName,
+        city: loc[0].city,
+        state: loc[0].stateCode,
+        zipcode: loc[0].zipcode,
+        country: loc[0].countryCode,
+      };
+
+      // Overwrite the initial location with the formatted address
+      update.location = loc[0].formattedAddress;
+
+      this.setUpdate(update);
+    } else {
+      throw new Error('Geocoding failed. Please provide a valid address.');
+    }
+  }
+
+  next();
+});
+
+
 businessSchema.index({ name: 'text', description: 'text', category: 'text' });
 
 module.exports = mongoose.model('Business', businessSchema);
