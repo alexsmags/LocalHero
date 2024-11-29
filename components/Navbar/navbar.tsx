@@ -1,6 +1,18 @@
-'use client'
+'use client';
 
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar } from "@nextui-org/react";
+import {
+  Navbar,
+  NavbarBrand,
+  NavbarContent,
+  NavbarItem,
+  Link,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Avatar,
+  Button,
+} from "@nextui-org/react";
 import Image from "next/image";
 import LogoLocalHero from "../../public/images/LocalHero_logo_no_background.png";
 import { AvatarIcon } from "@nextui-org/react";
@@ -68,73 +80,101 @@ export default function App() {
         ) : null}
       </NavbarContent>
 
-      {/* Navbar End - Avatar and Dropdown */}
+      {/* Navbar End - Avatar/Log In/Sign Up */}
       <NavbarContent className="items-center flex-shrink-0" justify="end">
-        <Dropdown placement="bottom-end">
-          <DropdownTrigger>
-            <Avatar
-              isBordered
-              as="button"
-              color="default"
-              icon={<AvatarIcon />}
-              classNames={{
-                base: "bg-gradient-to-br from-[#FFFFFF] to-[#FFFFFF]",
-                icon: "text-black/80",
-              }}
-            />
-          </DropdownTrigger>
-          <DropdownMenu
-            aria-label="Profile Actions"
-            variant="flat"
-            className="w-64 bg-white shadow-lg rounded-lg text-gray-800"
-          >
-            <DropdownItem
-              key="profile"
-              className="h-16 flex flex-col items-start gap-1 px-4 py-2 border-b border-gray-200"
+        {session ? (
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Avatar
+                isBordered
+                as="button"
+                color="default"
+                icon={<AvatarIcon />}
+                classNames={{
+                  base: "bg-gradient-to-br from-[#FFFFFF] to-[#FFFFFF]",
+                  icon: "text-black/80",
+                }}
+              />
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label="Profile Actions"
+              variant="flat"
+              className="w-64 bg-white shadow-lg rounded-lg text-gray-800"
             >
-              <p className="font-semibold text-sm text-gray-600">
-                Signed in as{" "}
-                <span className="text-gray-900">
-                  {session && session.user ? session.user.name : "Guest"}
+              <DropdownItem
+                key="profile"
+                className="h-20 flex flex-col items-start gap-1 px-4 py-2 border-b border-gray-200"
+              >
+                <p className="font-semibold text-sm text-gray-600">
+                  Signed in as{" "}
+                  <span className="text-gray-900">
+                    {session.user.name || "Guest"}
+                  </span>
+                </p>
+                <p className="text-xs text-gray-500">
+                  {`Role: ${session.user.role}`}
+                </p>
+                <p className="text-xs text-gray-500">{`Email: ${session.user.email}`}</p>
+                <p className="text-xs text-gray-500">{`Location: ${session.user.location}`}</p>
+              </DropdownItem>
+
+              <DropdownItem
+                key="settings"
+                className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100"
+              >
+                <span className="material-icons text-gray-500">My Settings</span>
+              </DropdownItem>
+
+              <DropdownItem
+                key="help_and_feedback"
+                className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100"
+              >
+                <span className="material-icons text-gray-500">
+                  Help & Feedback
                 </span>
-              </p>
-              <p className="text-xs text-gray-500">
-                {session && session.user ? `Role: ${session.user.role}` : ""}
-              </p>
-              <p className="text-xs text-gray-500">
-                {session && session.user ? session.user.email : ""}
-              </p>
-            </DropdownItem>
+              </DropdownItem>
 
-            <DropdownItem key="settings" className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100">
-              <span className="material-icons text-gray-500">My Settings</span>
-            </DropdownItem>
-
-            <DropdownItem key="help_and_feedback" className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100">
-              <span className="material-icons text-gray-500">Help & Feedback</span>
-            </DropdownItem>
-
-            <DropdownItem
-              key={session ? "logout" : "login"}
-              color={session ? "danger" : "primary"}
-              className={`flex items-center gap-2 px-4 py-3 ${
-                session ? "text-red-500" : "text-blue-500"
-              } hover:bg-gray-100`}
-              onPress={async () => {
-                if (session) {
+              <DropdownItem
+                key="logout"
+                color="danger"
+                className="flex items-center gap-2 px-4 py-3 text-red-500 hover:bg-gray-100"
+                onPress={async () => {
                   await signOut({ redirect: false });
                   router.push("/login");
-                } else {
-                  router.push("/login");
-                }
+                }}
+              >
+                <span className="material-icons" style={{ color: "#04b54e" }}>
+                  Log Out
+                </span>
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Button
+              color="success"
+              onClick={() => router.push("/login")}
+              style={{
+                fontFamily: "PPGoshaBold, sans-serif",
+                backgroundColor: "#FFFFFF",
+                color: "#04b54e",
               }}
             >
-              <span className="material-icons" style={{ color: "#04b54e" }}>
-                {session ? "Log Out" : "Log In"}
-              </span>
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
+              Log In
+            </Button>
+            <Button
+              color="success"
+              onClick={() => router.push("/signup")}
+              style={{
+                fontFamily: "PPGoshaBold, sans-serif",
+                backgroundColor: "#FFFFFF",
+                color: "#04b54e",
+              }}
+            >
+              Sign Up
+            </Button>
+          </div>
+        )}
       </NavbarContent>
     </Navbar>
   );

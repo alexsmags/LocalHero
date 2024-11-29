@@ -44,14 +44,18 @@ const SignupForm = () => {
       return;
     }
 
-
     if (!formData.role) {
       setError("Please select a role.");
       return;
     }
 
-    else if (!isValidEmail(formData.email)){ 
-      setError("Email is not valid.")
+    if (!formData.location) {
+      setError("Location cannot be empty.");
+      return;
+    }
+
+    if (!isValidEmail(formData.email)){ 
+      setError("Email is not valid.");
       return;
     }
 
@@ -102,9 +106,9 @@ const SignupForm = () => {
             onFocus={() => setIsEmailFocused(true)}
             onBlur={() => setIsEmailFocused(false)}
             onChange={(e) => {
-              setEmail(e.target.value); // Directly update the email state
-              setFormData(e); // Still update the reducer for the form data
-              setError(""); // Clear the error when typing
+              setEmail(e.target.value); 
+              setFormData(e); 
+              setError(""); 
             }}
           />
 
@@ -126,6 +130,14 @@ const SignupForm = () => {
             className="border-[#04b54e] focus:border-[#04b54e] border rounded-lg p-3 text-lg"
           />
 
+          <Input
+            fullWidth
+            color="success"
+            placeholder="Location (e.g., City or Zipcode)"
+            name="location"
+            onChange={setFormData}
+            className="border-[#04b54e] focus:border-[#04b54e] border rounded-lg p-3 text-lg"
+          />
 
           <div className="space-y-2">
             <p className="text-lg font-medium text-gray-700">Select your role:</p>
@@ -161,7 +173,6 @@ const SignupForm = () => {
             </label>
           </div>
 
-
           <Button
             type="submit"
             className="w-full mt-6 py-3 text-lg"
@@ -171,7 +182,6 @@ const SignupForm = () => {
           </Button>
 
           {error && <ErrorMessage message={error} />}
-
         </form>
 
         <p className="text-center mt-4 text-gray-600">

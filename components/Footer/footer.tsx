@@ -17,7 +17,7 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="/about" className="hover:underline">
+                <a href="https://github.com/alexsmags/LocalHero" className="hover:underline">
                   About us
                 </a>
               </li>

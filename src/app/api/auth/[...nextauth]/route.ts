@@ -36,6 +36,7 @@ export const authOptions: NextAuthOptions = {
         jwt(params: any){
             if(params.user?.role){
                 params.token.role = params.user.role;
+                params.token.location = params.user.location;
                 params.token.id = params.user.id;
             }
 
@@ -47,6 +48,7 @@ export const authOptions: NextAuthOptions = {
             if (session.user){
                 (session.user as {id: string}).id = token.id as string;
                 (session.user as {role: string}).role = token.role as string;
+                (session.user as {location: string}).location = token.location as string;
             }
 
             return session
