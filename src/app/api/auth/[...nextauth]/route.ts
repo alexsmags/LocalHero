@@ -11,7 +11,7 @@ export const authOptions: NextAuthOptions = {
                 email: {label: "Email", placeholder: "Enter Email"},
                 password: {label: "Password", placeholder: "Password"},
             },
-            async authorize(credentials, req) {
+            async authorize(credentials) {
                 const { email, password } = credentials as { email: string; password: string };
                     try {
                     const user = await User.findOne({ email });
@@ -27,33 +27,49 @@ export const authOptions: NextAuthOptions = {
                     return user;
                     } catch (error) {
                     console.log("Error: ", error);
+                    return null;
                     }
 
             },
         }),
     ],
     callbacks:{
-        jwt(params: any){
-            if(params.user?.role){
-                params.token.role = params.user.role;
-                params.token.location = params.user.location;
-                params.token.id = params.user.id;
+        async jwt({token, user, session, trigger}){
+
+            if (trigger === "update") {
+                token.name = session.name;
+                token.email = session.email;
+                token.location = session.location;
+                token.role = session.role;
             }
 
-            return params.token;
+            if (user){
 
+                return {
+                    ...token,
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    location: user.location,
+                    role: user.role,
+                };
+            }
+            
+            return token;
         },
-        session({session, token}) {
-
-            if (session.user){
-                (session.user as {id: string}).id = token.id as string;
-                (session.user as {role: string}).role = token.role as string;
-                (session.user as {location: string}).location = token.location as string;
-            }
-
-            return session
-
-        }
+        async session({session, token, user}) {
+            console.log("session callback", {session, token})
+            return {
+                ...session,
+                user: {
+                    id: token.id,
+                    name: token.name,
+                    email: token.email,
+                    location: token.location,
+                    role: token.role,
+                }
+            };
+        },
     },
     secret: process.env.NEXTAUTH_SECRET,
     pages: {
