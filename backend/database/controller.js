@@ -271,9 +271,10 @@ const getBusinessesFiltered = async (req, res, filters) => {
     }
 
     // Exact match for category (optional filter)
-    if (filters.categoryType) {
-      query.category = filters.categoryType;
+    if (filters.category) {
+      query.category = filters.category;
     }
+   
 
     // If both zipcode and radius are provided, use getBusinessesInRadius
     if (filters.zipcode && filters.radius) {
@@ -298,12 +299,12 @@ const getBusinessesFiltered = async (req, res, filters) => {
         });
 
         // If radius filtering is successful, filter further if needed
-        if (filters.term || filters.categoryType) {
+        if (filters.term || filters.category) {
           // Apply additional text and category filters to radius-filtered results
           return res.status(200).json(
             radiusResult.filter(business => {
               let matchesTerm = !filters.term;
-              let matchesCategory = !filters.categoryType;
+              let matchesCategory = !filters.category;
 
               if (filters.term) {
                 const searchRegex = new RegExp(filters.term, "i");
@@ -313,7 +314,7 @@ const getBusinessesFiltered = async (req, res, filters) => {
               }
 
               if (filters.categoryType) {
-                matchesCategory = business.category === filters.categoryType;
+                matchesCategory = business.category === filters.category;
               }
 
               return matchesTerm && matchesCategory;

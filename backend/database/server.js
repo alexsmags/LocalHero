@@ -103,11 +103,11 @@ app.prepare().then(() => {
   });
 
   server.get("/api/businessfilter", (req, res) => {
-    const { term, categoryType, zipcode, radius } = req.query;
+    const { term, category, zipcode, radius } = req.query;
   
     getBusinessesFiltered(req, res, {
       term,
-      categoryType,
+      category,
       zipcode,
       radius
     });
