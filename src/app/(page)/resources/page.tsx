@@ -157,7 +157,6 @@ const ResourcesPage = () => {
   };
   return (
     <div style={{ backgroundColor: '#E9ECEF', paddingBottom: '40px' }}>
-      {/* Hero Section */}
       <section
         data-aos="fade-up"
         style={{
@@ -188,9 +187,7 @@ const ResourcesPage = () => {
           Get Started
         </Button>
       </section>
-
-      {/* Videos Section */}
-      <section data-aos="fade-up" style={{ padding: '40px 20px' }}>
+      <section data-aos="fade-up" style={{ padding: '40px 34px' }}>
         <h2
           style={{
             fontSize: '32px',
@@ -202,7 +199,7 @@ const ResourcesPage = () => {
         >
           Watch and Learn
         </h2>
-        <Slider {...sliderSettings}>
+        <Slider {...sliderSettings} >
           {videos.map((video) => (
             <div key={video.id} style={{ padding: '10px', cursor: 'pointer' }}>
               <iframe

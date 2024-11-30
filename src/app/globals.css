@@ -35,7 +35,8 @@ body {
 
 .slick-prev:hover,
 .slick-next:hover {
-  transform: scale(1.1); 
+  transform: scale(1.2);
+  background-color: #028a3f; 
 }
 
 
