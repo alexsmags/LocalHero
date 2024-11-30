@@ -129,3 +129,14 @@
 ### (e) Local Artisan Management Page Mockup
 
 ![Local Artisan Management](Design/7Mockups/AManagement.png)
+
+
+### 8. Other Design Considerations
+
+## (a) Font - Poppins
+
+![Font](Design/7Mockups/Font.png)
+
+## (b) Colour Palette
+
+![Colour Palette](Design/7Mockups/Colour.png)
