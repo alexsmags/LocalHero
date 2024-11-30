@@ -10,3 +10,25 @@ This repository contains the code for our LocalHero website, created for the SOE
 - [ReactJS](https://www.typescriptlang.org/): Frontend library to facilitate creation of website
 - [NodeJS](https://nodejs.org/en/): Backend
 - [Mongoose](https://mongoosejs.com/docs/): Backend database used to store different values for users, properties, etc.
+- 
+## How to Use
+
+### Clone this repo
+
+Run the following command:
+
+```bash
+git clone https://github.com/alexsmags/LocalHero.git
+```
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Run the development server
+
+```bash
+npm run dev
+```
