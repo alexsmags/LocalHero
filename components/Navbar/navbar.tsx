@@ -238,7 +238,9 @@ export default function App() {
               color="success"
               onClick={() => router.push("/login")}
               style={{
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: "600", 
+                fontSize: "14px",
                 backgroundColor: "#FFFFFF",
                 color: "#04b54e",
               }}
@@ -249,7 +251,9 @@ export default function App() {
               color="success"
               onClick={() => router.push("/signup")}
               style={{
-                fontFamily: "PPGoshaBold, sans-serif",
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: "600", 
+                fontSize: "14px",
                 backgroundColor: "#FFFFFF",
                 color: "#04b54e",
               }}

@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { getBusinessesFiltered } from "../../../../backend/lib/HelperBusiness";
 import { Spinner } from "@nextui-org/react";
 import LocationFilterModal from '../../../../components/Modals/LocationFilterModal'; // Import the modal
+import { getUser } from '../../../../backend/lib/HelperUser'
 
 interface Business {
   _id: string;
@@ -17,10 +18,12 @@ interface Business {
   contactEmail: string;
   phone?: string;
   location: string;
-  owner?: string;
+  owner?: string; // ObjectID
+  ownerName?: string; // Fetched owner name
   createdAt: string;
   updatedAt: string;
 }
+
 
 const LocalBusinessesPage = () => {
   const router = useRouter();
@@ -39,13 +42,30 @@ const LocalBusinessesPage = () => {
     setLoading(true);
     try {
       const data = await getBusinessesFiltered(filters);
-      setBusinesses(data);
+      const businessesWithOwners = await Promise.all(
+        data.map(async (business: Business) => {
+          let ownerName = "Unknown";
+          if (business.owner) {
+            try {
+              const ownerData = await getUser(business.owner); 
+              ownerName = ownerData?.name || "Unknown"; 
+            } catch (error) {
+              console.error(`Failed to fetch owner for business ${business._id}:`, error);
+            }
+          }
+          return { ...business, ownerName }; 
+        })
+      );
+  
+      setBusinesses(businessesWithOwners); 
     } catch (error) {
       console.log("Failed to fetch businesses:", error);
     } finally {
       setLoading(false);
     }
   };
+  
+  
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -289,46 +309,73 @@ const LocalBusinessesPage = () => {
           <Spinner color="success" />
         ) : businesses.length > 0 ? (
           businesses.map((business) => (
-            <Card
-              key={business._id}
+          <Card
+            key={business._id}
+            style={{
+              maxWidth: '300px',
+              width: '100%',
+              border: '1px solid #e0e0e0',
+              borderRadius: '10px',
+              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column', 
+            }}
+          >
+            <img
+              src={business.image || 'https://via.placeholder.com/300x150?text=Business+Image'}
+              alt={business.name}
+              style={{ width: '100%', height: '150px', objectFit: 'cover' }}
+            />
+            <div
               style={{
-                maxWidth: '300px',
-                width: '100%',
-                border: '1px solid #e0e0e0',
-                borderRadius: '10px',
-                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-                overflow: 'hidden',
+                padding: '15px',
+                flex: '1', 
+                display: 'flex',
+                flexDirection: 'column',
               }}
             >
-              <img
-                src={business.image || 'https://via.placeholder.com/300x150?text=Business+Image'}
-                alt={business.name}
-                style={{ width: '100%', height: '150px', objectFit: 'cover' }}
-              />
-              <div style={{ padding: '15px' }}>
-                <h3 style={{ margin: '0 0 10px', fontSize: '18px' }}>{business.name}</h3>
-                <p style={{ margin: '0 0 5px', fontSize: '14px', color: '#555' }}>{business.description}</p>
-                <p><b>Category:</b> {business.category}</p>
-                <p><b>Location:</b> {business.location}</p>
-                <p><b>Email:</b> {business.contactEmail}</p>
-                {business.phone && <p><b>Phone:</b> {business.phone}</p>}
-                {business.website && (
-                  <Button
-                    size="sm"
-                    onClick={() => window.open(business.website, '_blank')}
-                    style={{
-                      backgroundColor: '#28a745',
-                      color: '#fff',
-                      borderRadius: '25px',
-                      width: '100%',
-                      marginTop: '15px',
-                    }}
-                  >
-                    Visit Website
-                  </Button>
-                )}
-              </div>
-            </Card>
+              <h3 style={{ margin: '0 0 10px', fontSize: '18px' }}>{business.name}</h3>
+              <p style={{ margin: '0 0 5px', fontSize: '14px', color: '#555' }}>{business.description}</p>
+              <p><b>Category:</b> {business.category}</p>
+              <p><b>Location:</b> {business.location}</p>
+              <p><b>Email:</b> {business.contactEmail}</p>
+              <p><b>Owner Name:</b> {business.ownerName}</p>
+              {business.phone && <p><b>Phone:</b> {business.phone}</p>}
+              {business.website ? (
+                <Button
+                  size="sm"
+                  onClick={() => window.open(business.website, '_blank')}
+                  style={{
+                    backgroundColor: '#28a745',
+                    color: '#fff',
+                    borderRadius: '25px',
+                    width: '100%',
+                    marginTop: 'auto',
+                  }}
+                >
+                  Visit Website
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  disabled 
+                  style={{
+                    backgroundColor: '#e0e0e0',
+                    color: '#888',
+                    borderRadius: '25px',
+                    width: '100%',
+                    marginTop: 'auto', 
+                    cursor: 'not-allowed',
+                  }}
+                >
+                  No Website Available
+                </Button>
+              )}
+            </div>
+          </Card>
+
+
           ))
         ) : (
           <p style={{ fontSize: '18px', color: '#888' }}>No businesses found.</p>

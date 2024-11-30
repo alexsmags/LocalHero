@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { getArtisanssFiltered } from "../../../../backend/lib/HelperArtisan";
 import { Spinner } from "@nextui-org/react";
 import LocationFilterModal from '../../../../components/Modals/LocationFilterModal';
+import { getUser } from '../../../../backend/lib/HelperUser'
 
 interface Artisan {
   _id: string;
@@ -17,7 +18,8 @@ interface Artisan {
   contactEmail: string;
   phone?: string;
   location: string;
-  owner?: string;
+  owner?: string; // ObjectID
+  artisanName?: string; // Fetched owner name
   createdAt: string;
   updatedAt: string;
 }
@@ -39,14 +41,29 @@ const LocalArtisansPage = () => {
     setLoading(true);
     try {
       const data = await getArtisanssFiltered(filters);
-      setArtisans(data);
+      const artisansWithOwners = await Promise.all(
+        data.map(async (artisan: Artisan) => {
+          let artisanName = "Unknown";
+          if (artisan.owner) {
+            try {
+              const ownerData = await getUser(artisan.owner); 
+              artisanName = ownerData?.name || "Unknown"; 
+            } catch (error) {
+              console.error(`Failed to fetch owner for artisan ${artisan._id}:`, error);
+            }
+          }
+          return { ...artisan, artisanName }; 
+        })
+      );
+  
+      setArtisans(artisansWithOwners); 
     } catch (error) {
       console.log("Failed to fetch artisans:", error);
     } finally {
       setLoading(false);
     }
   };
-
+  
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (searchTerm) params.append("term", searchTerm);
@@ -328,6 +345,8 @@ const LocalArtisansPage = () => {
                 borderRadius: '10px',
                 boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
                 overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column', 
               }}
             >
               <img
@@ -335,14 +354,22 @@ const LocalArtisansPage = () => {
                 alt={artisan.name}
                 style={{ width: '100%', height: '150px', objectFit: 'cover' }}
               />
-              <div style={{ padding: '15px' }}>
+              <div
+                style={{
+                  padding: '15px',
+                  flex: '1', 
+                  display: 'flex',
+                  flexDirection: 'column', 
+                }}
+              >
                 <h3 style={{ margin: '0 0 10px', fontSize: '18px' }}>{artisan.name}</h3>
                 <p style={{ margin: '0 0 5px', fontSize: '14px', color: '#555' }}>{artisan.bio}</p>
                 <p><b>Skills:</b> {artisan.skills.join(", ")}</p>
                 <p><b>Location:</b> {artisan.location}</p>
                 <p><b>Email:</b> {artisan.contactEmail}</p>
+                <p><b>Artisan Name:</b> {artisan.artisanName}</p>
                 {artisan.phone && <p><b>Phone:</b> {artisan.phone}</p>}
-                {artisan.website && (
+                {artisan.website ? (
                   <Button
                     size="sm"
                     onClick={() => window.open(artisan.website, '_blank')}
@@ -351,14 +378,31 @@ const LocalArtisansPage = () => {
                       color: '#fff',
                       borderRadius: '25px',
                       width: '100%',
-                      marginTop: '15px',
+                      marginTop: 'auto',
                     }}
                   >
-                    Visit Website
+                    Visit Profile
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    disabled 
+                    style={{
+                      backgroundColor: '#e0e0e0',
+                      color: '#888',
+                      borderRadius: '25px',
+                      width: '100%',
+                      marginTop: 'auto', 
+                      cursor: 'not-allowed', 
+                    }}
+                  >
+                    No Profile Available
                   </Button>
                 )}
               </div>
             </Card>
+
+
           ))
         ) : (
           <p style={{ fontSize: '18px', color: '#888' }}>No artisans found.</p>
