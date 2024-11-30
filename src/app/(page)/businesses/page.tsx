@@ -293,7 +293,6 @@ const LocalBusinessesPage = () => {
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onApply={applyLocationFilter}
-        initialZipcode={searchZipcode}
         initialRadius={Number(searchRadius) || 10}
       />
 

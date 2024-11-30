@@ -18,8 +18,8 @@ interface Artisan {
   contactEmail: string;
   phone?: string;
   location: string;
-  owner?: string; // ObjectID
-  artisanName?: string; // Fetched owner name
+  owner?: string;
+  artisanName?: string; 
   createdAt: string;
   updatedAt: string;
 }
@@ -320,7 +320,6 @@ const LocalArtisansPage = () => {
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onApply={applyLocationFilter}
-        initialZipcode={searchZipcode}
         initialRadius={Number(searchRadius) || 10}
       />
 

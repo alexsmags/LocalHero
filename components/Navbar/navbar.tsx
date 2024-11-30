@@ -204,6 +204,7 @@ export default function App() {
               <DropdownItem
                 key="settings"
                 className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100"
+                onClick={() => router.push("/account_settings")} // Navigate to /account_settings
               >
                 <span className="material-icons text-gray-500">My Settings</span>
               </DropdownItem>

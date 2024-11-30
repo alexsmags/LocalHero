@@ -20,10 +20,9 @@ export default function Home() {
     "/videos/dough.mp4"
   ];
 
-  const [currentVideo, setCurrentVideo] = useState(0); // Default to 0 initially
+  const [currentVideo, setCurrentVideo] = useState(0); 
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Set a random video index on the client after mounting
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * videoSources.length);
     setCurrentVideo(randomIndex);
@@ -36,7 +35,7 @@ export default function Home() {
 
     const timer = setTimeout(() => {
       switchToNextVideo();
-    }, 10000); // Switch video every 10 seconds
+    }, 10000); 
 
     return () => clearTimeout(timer);
   }, [currentVideo]);

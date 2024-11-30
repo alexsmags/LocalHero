@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import {
   Modal,
   ModalContent,
@@ -12,23 +13,29 @@ import {
 interface LocationFilterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onApply: (zipcode: string, radius: number) => void; 
-  initialZipcode?: string; 
-  initialRadius?: number; 
+  onApply: (zipcode: string, radius: number) => void;
+  initialRadius?: number;
 }
 
 export default function LocationFilterModal({
   isOpen,
   onClose,
   onApply,
-  initialZipcode = "",
   initialRadius = 10,
 }: LocationFilterModalProps) {
-  const [zipcode, setZipcode] = useState(initialZipcode);
+  const { data: session } = useSession(); // Get session data using NextAuth
+  const [zipcode, setZipcode] = useState(""); // Default to empty string
   const [radius, setRadius] = useState(initialRadius);
   const [formErrors, setFormErrors] = useState({ zipcode: "", radius: "" });
 
-  
+  useEffect(() => {
+    if (session?.user?.location) {
+      setZipcode(session.user.location); // Set user's location if logged in
+    } else {
+      setZipcode(""); // Default to empty if not logged in
+    }
+  }, [session]);
+
   const validateInputs = () => {
     const errors = { zipcode: "", radius: "" };
     let isValid = true;
@@ -46,7 +53,6 @@ export default function LocationFilterModal({
     setFormErrors(errors);
     return isValid;
   };
-
 
   const handleApplyFilters = () => {
     if (!validateInputs()) return;
