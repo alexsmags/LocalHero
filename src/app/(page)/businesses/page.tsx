@@ -223,7 +223,7 @@ const LocalBusinessesPage = () => {
           }}
         >
           <option value="">All Categories</option>
-          <option value="Food">Food and Beverage</option>
+          <option value="Food">Food</option>
           <option value="Retail">Retail and Shopping</option>
           <option value="Professional Services">Personal and Professional Services</option>
           <option value="Education">Education and Childcare</option>
