@@ -10,15 +10,14 @@ const AboutUsPage = () => {
     window.scrollTo(0, 0);
 
     AOS.init({
-      duration: 1000, // Animation duration in ms
+      duration: 1000,
       easing: 'ease-in-out',
-      once: true, // Animation triggers only once
+      once: true, 
     });
   }, []);
 
   return (
     <div style={{ backgroundColor: '#F9FAFB', paddingBottom: '40px' }}>
-      {/* Hero Section */}
       <section
         data-aos="fade-up"
         style={{
